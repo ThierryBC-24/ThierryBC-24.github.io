@@ -107,5 +107,8 @@
       }
     }
   },
-  "defaultProject": "INF8808"
+  "defaultProject": "INF8808",
+  "cli": {
+    "analytics": false
+  }
 }

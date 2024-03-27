@@ -3,14 +3,16 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { WaffleChartComponent } from './waffle-chart/waffle-chart.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    WaffleChartComponent,
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

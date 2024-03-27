@@ -3,10 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { BubbleBarChartComponent } from './bubble-bar-chart/bubble-bar-chart.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    BubbleBarChartComponent
   ],
   imports: [
     BrowserModule,

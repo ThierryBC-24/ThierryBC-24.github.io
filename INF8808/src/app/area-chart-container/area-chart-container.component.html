@@ -1,0 +1,6 @@
+<app-area-chart
+  *ngFor="let datapoint of this.data; let index = index"
+  [data]="datapoint.data"
+  [sector]="datapoint.SECTEUR_SCIAN"
+  [id]="index"
+></app-area-chart>

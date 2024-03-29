@@ -1,5 +1,12 @@
 import { viz1_data } from 'data/Viz 1/lesions_secteur_annee.constants';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import * as d3 from 'd3';
 
 interface DataPoint {
@@ -18,69 +25,34 @@ enum Colors {
   templateUrl: './area-chart.component.html',
   styleUrls: ['./area-chart.component.scss'],
 })
-export class AreaChartComponent {
-  originalData: {
-    ANNEE: number;
-    SECTEUR_SCIAN: string;
-    NB_LESION: number;
-  }[];
+export class AreaChartComponent implements AfterViewInit {
   color: Colors = Colors.DECREASING;
-  data!: DataPoint[];
+  @Input() data!: DataPoint[];
+  @Input() sector!: string;
+  @Input() id!: number;
+
   maxY: number = 0;
   private svg: any;
   private margin = 5;
   private width = 100 - this.margin * 2;
   private height = 50 - this.margin * 2;
-  constructor() {
-    this.originalData = viz1_data;
-  }
+  constructor() {}
 
-  ngOnInit(): void {
-    const groupedData = this.groupDataBySecteur();
-    const preparedData = this.prepareDataForD3(groupedData);
-    this.data = preparedData[0].data;
+  ngAfterViewInit(): void {
     this.maxY = Math.max(...this.data.map((d) => d.NB_LESION));
+    this.getColor();
     this.createSvg();
     this.drawPlot();
   }
 
-  private groupDataBySecteur(): Map<
-    string,
-    { ANNEE: number; NB_LESION: number }[]
-  > {
-    const groupedData = new Map<
-      string,
-      { ANNEE: number; NB_LESION: number }[]
-    >();
-
-    this.originalData.forEach((item) => {
-      if (!groupedData.has(item.SECTEUR_SCIAN)) {
-        groupedData.set(item.SECTEUR_SCIAN, []);
-      }
-      groupedData
-        .get(item.SECTEUR_SCIAN)!
-        .push({ ANNEE: item.ANNEE, NB_LESION: item.NB_LESION });
-    });
-
-    return groupedData;
-  }
-
-  private prepareDataForD3(
-    groupedData: Map<string, { ANNEE: number; NB_LESION: number }[]>
-  ): { SECTEUR_SCIAN: string; data: { ANNEE: number; NB_LESION: number }[] }[] {
-    const preparedData: any = [];
-
-    groupedData.forEach((values, key) => {
-      const sortedValues = values.sort((a, b) => a.ANNEE - b.ANNEE);
-      preparedData.push({ SECTEUR_SCIAN: key, data: sortedValues });
-    });
-
-    return preparedData;
+  private getColor() {
+    const first = this.data[0].NB_LESION;
+    const last = this.data[this.data.length - 1].NB_LESION;
   }
 
   private createSvg(): void {
     this.svg = d3
-      .select('figure#area')
+      .select('figure#area-' + this.id)
       .append('svg')
       .attr('width', this.width + this.margin * 2)
       .attr('height', this.height + this.margin * 2)

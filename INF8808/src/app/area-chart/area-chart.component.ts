@@ -14,19 +14,13 @@ interface DataPoint {
   NB_LESION: number;
 }
 
-enum Colors {
-  INCREASING = '#D92C2C',
-  STABLE = '#E68004',
-  DECREASING = '#14B8A6',
-}
-
 @Component({
   selector: 'app-area-chart',
   templateUrl: './area-chart.component.html',
   styleUrls: ['./area-chart.component.scss'],
 })
 export class AreaChartComponent implements AfterViewInit {
-  color: Colors = Colors.DECREASING;
+  @Input() color!: string;
   @Input() data!: DataPoint[];
   @Input() sector!: string;
   @Input() id!: number;
@@ -40,14 +34,8 @@ export class AreaChartComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.maxY = Math.max(...this.data.map((d) => d.NB_LESION));
-    this.getColor();
     this.createSvg();
     this.drawPlot();
-  }
-
-  private getColor() {
-    const first = this.data[0].NB_LESION;
-    const last = this.data[this.data.length - 1].NB_LESION;
   }
 
   private createSvg(): void {

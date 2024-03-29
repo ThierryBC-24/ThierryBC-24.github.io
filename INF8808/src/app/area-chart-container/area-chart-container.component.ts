@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { viz1_data } from 'data/Viz 1/lesions_secteur_annee.constants';
 
+enum Colors {
+  INCREASING = '#D92C2C',
+  STABLE = '#E68004',
+  DECREASING = '#14B8A6',
+}
+
 @Component({
   selector: 'app-area-chart-container',
   templateUrl: './area-chart-container.component.html',
@@ -19,13 +25,32 @@ export class AreaChartContainerComponent implements OnInit {
       NB_LESION: number;
     }[];
   }[] = [];
+
   constructor() {
     this.originalData = viz1_data;
-  }
-
-  ngOnInit(): void {
     const groupedData = this.groupDataBySecteur();
     this.data = this.prepareDataForD3(groupedData);
+  }
+
+  public get colors(): typeof Colors {
+    return Colors;
+  }
+
+  ngOnInit(): void {}
+
+  public groupByCategory(color: Colors) {
+    return this.data.filter(
+      (datapoint) => this.getColor(datapoint.data) == color
+    );
+  }
+
+  private getColor(data: any) {
+    const first = data[0].NB_LESION;
+    const last = data[data.length - 1].NB_LESION;
+    const ratio = last / first;
+    if (ratio > 1.15) return Colors.INCREASING;
+    else if (ratio < 0.85) return Colors.DECREASING;
+    return Colors.STABLE;
   }
 
   private groupDataBySecteur(): Map<

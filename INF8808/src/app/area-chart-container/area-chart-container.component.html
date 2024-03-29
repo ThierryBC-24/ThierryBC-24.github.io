@@ -1,6 +1,37 @@
+<h2>BAISSE</h2>
 <app-area-chart
-  *ngFor="let datapoint of this.data; let index = index"
+  *ngFor="
+    let datapoint of this.groupByCategory(colors.DECREASING);
+    let index = index
+  "
   [data]="datapoint.data"
   [sector]="datapoint.SECTEUR_SCIAN"
+  [color]="colors.DECREASING"
   [id]="index"
+></app-area-chart>
+
+<h2>STABLE</h2>
+
+<app-area-chart
+  *ngFor="
+    let datapoint of this.groupByCategory(colors.STABLE);
+    let index = index
+  "
+  [data]="datapoint.data"
+  [sector]="datapoint.SECTEUR_SCIAN"
+  [color]="colors.STABLE"
+  [id]="index + 100"
+></app-area-chart>
+
+<h2>HAUSSE</h2>
+
+<app-area-chart
+  *ngFor="
+    let datapoint of this.groupByCategory(colors.INCREASING);
+    let index = index
+  "
+  [data]="datapoint.data"
+  [sector]="datapoint.SECTEUR_SCIAN"
+  [id]="index + 1000"
+  [color]="colors.INCREASING"
 ></app-area-chart>

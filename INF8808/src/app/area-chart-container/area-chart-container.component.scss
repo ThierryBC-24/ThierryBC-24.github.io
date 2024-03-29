@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.baisse {
+  color: #14b8a6;
+  position: relative;
+}
+
+.stable {
+  color: #e68004;
+  position: relative;
+}
+
+.hausse {
+  color: #d92c2c;
+  position: relative;
+}
+
+.baisse .title div {
+  background-color: #14b8a6;
+}
+
+.stable .title div {
+  background-color: #e68004;
+}
+
+.hausse .title div {
+  background-color: #d92c2c;
+}
+
+.baisse .title div,
+.stable .title div,
+.hausse .title div {
+  flex-grow: 1;
+  height: 2px;
+  opacity: 0.25;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+h2 {
+  width: 310px;
+  margin: 0;
+  padding: 0;
+}

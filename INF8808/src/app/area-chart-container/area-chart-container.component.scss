@@ -1,7 +1,9 @@
 .container {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: start;
+  justify-content: start;
+  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 * {
@@ -53,4 +55,9 @@ h2 {
   width: 310px;
   margin: 0;
   padding: 0;
+}
+
+.area-graph {
+  width: fit-content;
+  margin: auto;
 }

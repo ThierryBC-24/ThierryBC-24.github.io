@@ -8,6 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import * as d3 from 'd3';
+import { sectorNameMapping } from 'src/constants';
 
 interface DataPoint {
   ANNEE: number;
@@ -28,7 +29,7 @@ export class AreaChartComponent implements AfterViewInit {
   maxY: number = 0;
   private svg: any;
   private margin = 5;
-  private width = 100 - this.margin * 2;
+  private width = 120 - this.margin * 2;
   private height = 50 - this.margin * 2;
   constructor() {}
 
@@ -38,12 +39,17 @@ export class AreaChartComponent implements AfterViewInit {
     this.drawPlot();
   }
 
+  shortenSectorName() {
+    return sectorNameMapping[this.sector] ?? this.sector;
+  }
+
   private createSvg(): void {
     this.svg = d3
       .select('figure#area-' + this.id)
       .append('svg')
       .attr('width', this.width + this.margin * 2)
       .attr('height', this.height + this.margin * 2)
+      .style('overflow', 'visible')
       .append('g')
       .attr('transform', 'translate(' + this.margin + ',' + this.margin + ')');
   }
@@ -91,5 +97,21 @@ export class AreaChartComponent implements AfterViewInit {
       .attr('stroke', this.color) // Outline color
       .attr('stroke-width', 2) // Outline width
       .attr('d', line);
+
+    const last = this.data[this.data.length - 1];
+    const first = this.data[0];
+    const ratio = (last.NB_LESION - first.NB_LESION) / first.NB_LESION;
+
+    // Add text over the last data point
+    this.svg
+      .append('text')
+      .text(`${Math.round(ratio * 100)}%`)
+      .attr('x', x(last.ANNEE))
+      .attr('y', y(last.NB_LESION) - 10)
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'middle')
+      .style('font-size', '12px')
+      .style('fill', this.color)
+      .style('font-weight', 'bold');
   }
 }

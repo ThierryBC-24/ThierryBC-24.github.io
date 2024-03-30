@@ -1,4 +1,4 @@
-export enum AccidentCategory {
+export enum CategorieGenre {
     Contact = "Contact avec un object ou de l'equipement",
     Chutes = "Chutes",
     Reaction = "Reactions du corps et efforts",
@@ -9,35 +9,35 @@ export enum AccidentCategory {
     Autres = "Autres ou indetermines",
 };
 
-export type Accident = {
-    type: string;
-    category: AccidentCategory;
-    count: number;
+export type Lesion = {
+    genre: string;
+    categorie_genre: string;
+    nb_lesion: number;
 };
 
-export const data: Accident[] = [
-    { type: "Heurter un object", category: AccidentCategory.Contact, count: 100 },
-    { type: "Heurter un object", category: AccidentCategory.Chutes, count: 200 },
-    { type: "Heurter un object", category: AccidentCategory.Reaction, count: 300 },
-    { type: "Heurter un object", category: AccidentCategory.Exposition, count: 400 },
-    { type: "Heurter un object", category: AccidentCategory.Transport, count: 500 },
-    { type: "Heurter un object", category: AccidentCategory.Aggression, count: 600 },
-    { type: "Heurter un object", category: AccidentCategory.Feux, count: 700 },
-    { type: "Heurter un object", category: AccidentCategory.Autres, count: 800 },
-    { type: "Heurter un object", category: AccidentCategory.Contact, count: 100 },
-    { type: "Heurter un object", category: AccidentCategory.Chutes, count: 200 },
-    { type: "Heurter un object", category: AccidentCategory.Reaction, count: 300 },
-    { type: "Heurter un object", category: AccidentCategory.Exposition, count: 400 },
-    { type: "Heurter un object", category: AccidentCategory.Transport, count: 500 },
-    { type: "Heurter un object", category: AccidentCategory.Aggression, count: 600 },
-    { type: "Heurter un object", category: AccidentCategory.Feux, count: 700 },
-    { type: "Heurter un object", category: AccidentCategory.Autres, count: 800 },
-    { type: "Heurter un object", category: AccidentCategory.Contact, count: 100 },
-    { type: "Heurter un object", category: AccidentCategory.Chutes, count: 200 },
-    { type: "Heurter un object", category: AccidentCategory.Reaction, count: 300 },
-    { type: "Heurter un object", category: AccidentCategory.Exposition, count: 400 },
-    { type: "Heurter un object", category: AccidentCategory.Transport, count: 500 },
-    { type: "Heurter un object", category: AccidentCategory.Aggression, count: 600 },
-    { type: "Heurter un object", category: AccidentCategory.Feux, count: 700 },
-    { type: "Heurter un object", category: AccidentCategory.Autres, count: 800 },
+export const data: Lesion[] = [
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Contact, nb_lesion: 100 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Chutes, nb_lesion: 200 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Reaction, nb_lesion: 300 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Exposition, nb_lesion: 400 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Transport, nb_lesion: 500 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Aggression, nb_lesion: 600 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Feux, nb_lesion: 700 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Autres, nb_lesion: 800 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Contact, nb_lesion: 100 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Chutes, nb_lesion: 200 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Reaction, nb_lesion: 300 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Exposition, nb_lesion: 400 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Transport, nb_lesion: 500 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Aggression, nb_lesion: 600 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Feux, nb_lesion: 700 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Autres, nb_lesion: 800 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Contact, nb_lesion: 100 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Chutes, nb_lesion: 200 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Reaction, nb_lesion: 300 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Exposition, nb_lesion: 400 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Transport, nb_lesion: 500 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Aggression, nb_lesion: 600 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Feux, nb_lesion: 700 },
+    { genre: "Heurter un object", categorie_genre: CategorieGenre.Autres, nb_lesion: 800 },
 ];

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
-import { data } from './data';
+import { Lesion, data } from './data';
 
 @Component({
   selector: 'app-bubble-bar-chart',
@@ -8,7 +8,10 @@ import { data } from './data';
   styleUrls: ['./bubble-bar-chart.component.scss']
 })
 export class BubbleBarChartComponent implements OnInit {
-  private data = data;
+  // private data = data;
+  private data: Lesion[] = [];
+  private path = "/assets/data/Viz 6/genre_categorie_lesion.csv";
+
   private svg: any;
   private margin = 50;
   private width = 750 - (this.margin * 2);
@@ -22,17 +25,32 @@ export class BubbleBarChartComponent implements OnInit {
 
   ngOnInit(): void {
     // TODO: Add fetch to data (tp4)
+    d3.text(this.path).then((data) => {
+      let rowIndex = 0;
+      for (const row of data.split('\n')) {
+        rowIndex++;
+        if (rowIndex === 1 || row === '') {
+          continue;
+        }
+        const columns = row.split(';');
+        this.data.push({
+          genre: columns[0],
+          categorie_genre: columns[1],
+          nb_lesion: +columns[2],
+        });
+      }
 
-    this.xAxis = this.setXScale();
-    this.yAxis = this.setYScale();
+      this.xAxis = this.setXScale();
+      this.yAxis = this.setYScale();
 
-    this.createSvg();
-    this.drawBubble();
-    this.drawXAxis();
-    this.drawYAxis();
+      this.createSvg();
+      this.drawBubble();
+      this.drawXAxis();
+      this.drawYAxis();
 
-    const simulation = this.getSimulation()
-    this.simulate(simulation)
+      const simulation = this.getSimulation()
+      this.simulate(simulation)
+    });
   }
 
   private createSvg(): void {
@@ -49,13 +67,13 @@ export class BubbleBarChartComponent implements OnInit {
   private setXScale(): d3.ScaleBand<string> {
     return d3.scaleBand()
     .range([0, this.width])
-    .domain(this.data.map(d => d.category))
+    .domain(Array.from(new Set(this.data.map(d => d.categorie_genre))))
     .padding(0.2);
   }
 
   private setYScale(): d3.ScaleLinear<number, number> {
     return d3.scaleLinear()
-    .domain([0, d3.max(this.data, d => d.count) as number])
+    .domain([0, d3.max(this.data, d => d.nb_lesion) as number])
     .range([this.height, 0]);
   }
 
@@ -63,20 +81,20 @@ export class BubbleBarChartComponent implements OnInit {
 
   private drawBubble(): void {
     this.svg.selectAll(".bubble")
-    .data(data)
+    .data(this.data)
     .enter()
     .append("circle")
     .attr("class", "bubble")
     .attr("cx", (d: any) => {
-      d.x = (this.xAxis as d3.ScaleBand<string>)(d.category) as number + (this.xAxis as d3.ScaleBand<string>).bandwidth() / 2
-      return (this.xAxis as d3.ScaleBand<string>)(d.category) as number + (this.xAxis as d3.ScaleBand<string>).bandwidth() / 2
+      d.x = (this.xAxis as d3.ScaleBand<string>)(d.categorie_genre) as number + (this.xAxis as d3.ScaleBand<string>).bandwidth() / 2
+      return (this.xAxis as d3.ScaleBand<string>)(d.categorie_genre) as number + (this.xAxis as d3.ScaleBand<string>).bandwidth() / 2
     })
     .attr("cy", (d: any) => {
-      // (this.yAxis as d3.ScaleLinear<number, number>)(d.count) as number
-      d.y = (this.yAxis as d3.ScaleLinear<number, number>)(400) as number
-      return (this.yAxis as d3.ScaleLinear<number, number>)(400) as number
+      // (this.yAxis as d3.ScaleLinear<number, number>)(d.nb_lesion) as number
+      d.y = (this.yAxis as d3.ScaleLinear<number, number>)(60000) as number
+      return (this.yAxis as d3.ScaleLinear<number, number>)(60000) as number
     })
-    .attr("r", (d: any) => d.count / 30)
+    .attr("r", (d: any) => d.nb_lesion / 2500)
     .attr("opacity", 0.7)
     .style("fill", "#d04a35")
     .on("mouseenter", function(event: any) {
@@ -105,6 +123,7 @@ export class BubbleBarChartComponent implements OnInit {
   }
 
   // Simulation
+
   private getSimulation() {
     return d3.forceSimulation(this.data as d3.SimulationNodeDatum[])
       .alphaDecay(0)

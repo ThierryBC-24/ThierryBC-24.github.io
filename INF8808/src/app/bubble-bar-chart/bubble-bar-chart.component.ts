@@ -13,9 +13,9 @@ export class BubbleBarChartComponent implements OnInit {
   private path = "/assets/data/Viz 6/genre_categorie_lesion.csv";
 
   private svg: any;
-  private margin = 50;
-  private width = 750 - (this.margin * 2);
-  private height = 400 - (this.margin * 2);
+  private margin = 150;
+  private width = 750;
+  private height = 400;
 
   private xAxis: d3.ScaleBand<string> | undefined;
   private yAxis: d3.ScaleLinear<number, number> | undefined;
@@ -24,7 +24,6 @@ export class BubbleBarChartComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    // TODO: Add fetch to data (tp4)
     d3.text(this.path).then((data) => {
       let rowIndex = 0;
       for (const row of data.split('\n')) {
@@ -59,7 +58,7 @@ export class BubbleBarChartComponent implements OnInit {
     .attr("width", this.width + (this.margin * 2))
     .attr("height", this.height + (this.margin * 2))
     .append("g")
-    .attr("transform", "translate(" + this.margin + "," + this.margin + ")");
+    .attr("transform", "translate(" + this.margin / 2 + "," + 0 + ")");
   }
 
   // Scales

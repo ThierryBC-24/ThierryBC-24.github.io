@@ -67,7 +67,7 @@ export class BubbleBarChartComponent implements OnInit {
     return d3.scaleBand()
     .range([0, this.width])
     .domain(Array.from(new Set(this.data.map(d => d.categorie_genre))))
-    .padding(0.2);
+    .padding(0.1);
   }
 
   private setYScale(): d3.ScaleLinear<number, number> {
@@ -85,15 +85,15 @@ export class BubbleBarChartComponent implements OnInit {
     .append("circle")
     .attr("class", "bubble")
     .attr("cx", (d: any) => {
-      d.x = (this.xAxis as d3.ScaleBand<string>)(d.categorie_genre) as number + (this.xAxis as d3.ScaleBand<string>).bandwidth() / 2
-      return (this.xAxis as d3.ScaleBand<string>)(d.categorie_genre) as number + (this.xAxis as d3.ScaleBand<string>).bandwidth() / 2
+      d.x = (this.xAxis as d3.ScaleBand<string>)(d.categorie_genre) as number
+      return (this.xAxis as d3.ScaleBand<string>)(d.categorie_genre) as number
     })
     .attr("cy", (d: any) => {
       // (this.yAxis as d3.ScaleLinear<number, number>)(d.nb_lesion) as number
       d.y = (this.yAxis as d3.ScaleLinear<number, number>)(60000) as number
       return (this.yAxis as d3.ScaleLinear<number, number>)(60000) as number
     })
-    .attr("r", (d: any) => d.nb_lesion / 2500)
+    .attr("r", (d: any) => d.nb_lesion / 2000)
     .attr("opacity", 0.7)
     .style("fill", "#d04a35")
     .on("mouseenter", function(event: any) {
@@ -124,13 +124,39 @@ export class BubbleBarChartComponent implements OnInit {
   // Simulation
 
   private getSimulation() {
+
+    // Base simulation
+
+    // return d3.forceSimulation(this.data as d3.SimulationNodeDatum[])
+    //   .alphaDecay(0)
+    //   .velocityDecay(0.75)
+    //   // .force('collision',
+    //   //   d3.forceCollide(20)
+    //   //     .strength(1)
+    //   // )
+    //   .force("collide", d3.forceCollide(20).iterations(10));
+
+    // Link simulation
+
+    // return d3.forceSimulation(this.data as d3.SimulationNodeDatum[])
+    //   .force("link", d3.forceLink().id(function(d) { return d.index ? d.index : 0; }).distance(100))
+    //   .force("charge", d3.forceManyBody().distanceMax(600/2).strength(1))
+    //   .force("collide", d3.forceCollide(30).iterations(10))
+    //   // .force("center", d3.forceCenter(860/2, 600/2));
+
+    // center simulation
+
+    // return d3.forceSimulation(this.data as d3.SimulationNodeDatum[])
+    //   .force("x", d3.forceX(this.width / 2).strength(0.05))
+    //   .force("y", d3.forceY(this.height / 2).strength(0.05))
+    //   .force("collide", d3.forceCollide(function(d: any) { return d.nb_lesion / 2000; }).iterations(10))
+
+    // categorie_genre simulation
+
     return d3.forceSimulation(this.data as d3.SimulationNodeDatum[])
-      .alphaDecay(0)
-      .velocityDecay(0.75)
-      .force('collision',
-        d3.forceCollide(20)
-          .strength(1)
-      );
+      .force("x", d3.forceX().x((d: any) => (this.xAxis as d3.ScaleBand<string>)(d.categorie_genre) as number + (this.xAxis as d3.ScaleBand<string>).bandwidth() / 2))
+      .force("y", d3.forceY().y((d: any) => (this.yAxis as d3.ScaleLinear<number, number>)(60000) as number))
+      .force("collide", d3.forceCollide(function(d: any) { return d.nb_lesion / 2000; }).iterations(10))
   }
 
   private simulate(simulation: any) {

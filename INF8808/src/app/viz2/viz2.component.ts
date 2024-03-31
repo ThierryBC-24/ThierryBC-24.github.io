@@ -211,26 +211,25 @@ export class Viz2Component implements OnInit {
     }, {});
 
     const padding = 20;
-    // console.log(data.map(item => item.NLesions));
+
+    // const x = d3.scaleLinear()
+    //   .domain([0, Math.max(...data.map(item => item.NLesions)) + 10000])
+    //   .range([0, this.width - this.margin]);
     const x = d3.scaleLinear()
-      .domain([0, Math.max(...data.map(item => item.NLesions)) + 10000])
-      .range([0, this.width - this.margin]);
+      .domain([0, 20000, 20000, Math.max(...data.map(item => item.NLesions)) + 20000])
+      .range([0, (this.width - this.margin) - 400, (this.width - this.margin) - 400, this.width - this.margin]);
     
     const y = d3.scaleBand()
       .domain(data.map(d => d.BodySeat))
       .rangeRound([this.margin, this.height - this.margin])
       .padding(0.3);
 
-    // const fx = d3.scaleBand()
-    //   .domain(bodyParts)
-    //   .rangeRound([this.margin, this.height - this.margin - bodyParts.size * padding])
-
     const color = d3.scaleOrdinal()
       .domain(bodyParts)
       .range(d3.schemeSpectral[bodyParts.size])
       .unknown("#ccc");
 
-    // console.log(d3.group(data, d => d.BodyPart));
+    console.log(data.map(item => item.NLesions));
 
     this.svg.append("g")
       .selectAll()
@@ -247,15 +246,20 @@ export class Viz2Component implements OnInit {
         .attr("height", y.bandwidth())
         // .attr("height", this.barHeight)
         .attr("width", (d: any) => {
-          console.log(x(d.NLesions));
+          // console.log(x(d.NLesions));
           return x(d.NLesions);
         })
         .attr("fill", (d: any) => color(d.BodyPart));
 
+    const tickValuesArray = d3.range(15).map((d) => {
+      return x.invert(this.width * (d / 14))
+    });
     // x-axis
     this.svg.append("g")
       .attr("transform", `translate(${this.marginLeft},${this.height})`)
-      .call(d3.axisBottom(x).tickSizeOuter(0));
+      .call(d3.axisBottom(x)
+              // .tickSizeOuter(0)
+              .tickValues([2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 45000, 70000]));
     
     // y-axis
     const y_axis = this.svg.append("g")
@@ -272,6 +276,24 @@ export class Viz2Component implements OnInit {
           return `translate(0,${(occurences[d.BodyPart] - 1) * y.bandwidth() + a})`;
         }
     );
+
+    // Première option
+    this.svg.append('line')
+      .style("stroke", "black")
+      .style("stroke-width", 2)
+      .attr('stroke-dasharray', ('3,3'))
+      .attr("x1", x(20000) + this.marginLeft)
+      .attr("y1", this.margin)
+      .attr("x2", x(20000) + this.marginLeft)
+      .attr("y2", this.height);  
+
+  // Deuxième option
+  //   this.svg.append("rect")
+  //     .style('opacity', 0.5)
+  //     .attr("x", x(20000) + this.marginLeft)
+  //     .attr("y", this.margin)
+  //     .attr("height", this.height - this.margin)
+  //     .attr("width", x(50000) - x(20000));  
   }
 
 }

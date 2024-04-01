@@ -1,1 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
+
+.tooltip-area {
+  text-align: center;
+  font-size: 0.75rem;
+  color: black;
+  width: 100px;
+  background-color: white;
+  padding: 0.5rem 0.25rem;
+  border-radius: 5px;
+  pointer-events: none;
+  transform: translateX(-50%);
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  z-index: 99;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.tooltip-area::before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 10px;
+  height: 10px;
+  left: 50%;
+  bottom: 0;
+  background-color: white;
+  transform: translate(-50%, 50%) rotate(45deg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.075);
+  border-right: 1px solid rgba(0, 0, 0, 0.075);
+}
+
+.tooltip-area > div {
+  width: 10px;
+  height: 10px;
+  background: red;
+}

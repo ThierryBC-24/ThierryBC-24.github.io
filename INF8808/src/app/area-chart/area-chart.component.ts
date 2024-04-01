@@ -47,6 +47,7 @@ export class AreaChartComponent implements AfterViewInit {
     this.svg = d3
       .select('figure#area-' + this.id)
       .append('svg')
+      .style('position', 'relative')
       .attr('width', this.width + this.margin * 2)
       .attr('height', this.height + this.margin * 2)
       .style('overflow', 'visible')
@@ -72,16 +73,6 @@ export class AreaChartComponent implements AfterViewInit {
       .attr('fill', this.color)
       .attr('opacity', 0.3)
       .attr('d', area);
-
-    // // Add labels
-    // const dots = this.svg.append('g');
-    // dots
-    //   .selectAll('text')
-    //   .data(this.data)
-    //   .enter()
-    //   .append('text')
-    //   .attr('x', (d: any) => x(d.ANNEE))
-    //   .attr('y', (d: any) => y(d.NB_LESION));
 
     const line = d3
       .line()
@@ -112,6 +103,40 @@ export class AreaChartComponent implements AfterViewInit {
       .attr('alignment-baseline', 'middle')
       .style('font-size', '12px')
       .style('fill', this.color)
+      .style('z-index', 0)
+      .style('pointer-events', 'none')
       .style('font-weight', 'bold');
+
+    const tooltip = d3
+      .select('figure#area-' + this.id)
+      .style('position', 'relative')
+      .append('div')
+      .style('opacity', 0);
+    const color = this.color;
+    this.svg
+      .selectAll('circle')
+      .data(this.data)
+      .enter()
+      .append('circle')
+      .attr('cx', (d: any) => x(d.ANNEE))
+      .attr('cy', (d: any) => y(d.NB_LESION))
+      .attr('r', 10)
+      .attr('fill', 'transparent')
+      .style('z-index', 999)
+      .on('mouseover', function (event: Event, d: any) {
+        const [xPos, yPos] = d3.pointer(event);
+        tooltip.transition().duration(200).style('opacity', 1);
+        tooltip
+          .html(
+            `<div style='background: ${color}'></div>${d.ANNEE} - ${d.NB_LESION}`
+          )
+          .style('position', 'absolute')
+          .style('left', xPos + 'px')
+          .style('top', -35 + 'px')
+          .classed('tooltip-area', true);
+      })
+      .on('mouseout', function (event: Event, d: any) {
+        tooltip.transition().duration(100).style('opacity', 0);
+      });
   }
 }

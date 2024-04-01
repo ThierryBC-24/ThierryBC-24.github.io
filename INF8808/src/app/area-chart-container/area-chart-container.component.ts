@@ -1,4 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { viz1_data } from 'data/Viz 1/lesions_secteur_annee.constants';
 
 enum Colors {
@@ -12,7 +19,8 @@ enum Colors {
   templateUrl: './area-chart-container.component.html',
   styleUrls: ['./area-chart-container.component.scss'],
 })
-export class AreaChartContainerComponent implements OnInit {
+export class AreaChartContainerComponent implements OnInit, AfterViewInit {
+  @ViewChildren('chart') charts!: QueryList<ElementRef>;
   originalData: {
     ANNEE: number;
     SECTEUR_SCIAN: string;
@@ -30,6 +38,24 @@ export class AreaChartContainerComponent implements OnInit {
     this.originalData = viz1_data;
     const groupedData = this.groupDataBySecteur();
     this.data = this.prepareDataForD3(groupedData);
+  }
+
+  ngAfterViewInit(): void {
+    this.charts.forEach((element, index) => {
+      element.nativeElement.addEventListener('mouseover', () => {
+        this.charts.forEach((el, i) => {
+          if (i !== index) {
+            el.nativeElement.style.opacity = '0.5';
+          }
+        });
+      });
+
+      element.nativeElement.addEventListener('mouseout', () => {
+        this.charts.forEach((el) => {
+          el.nativeElement.style.opacity = '1';
+        });
+      });
+    });
   }
 
   public get colors(): typeof Colors {

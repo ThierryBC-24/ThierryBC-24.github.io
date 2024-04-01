@@ -18,22 +18,7 @@
   justify-content: space-evenly;
 }
 
-.tooltip-area::before {
-  content: "";
-  position: absolute;
-  display: block;
-  width: 10px;
-  height: 10px;
-  left: 50%;
-  bottom: 0;
-  background-color: white;
-  transform: translate(-50%, 50%) rotate(45deg);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.075);
-  border-right: 1px solid rgba(0, 0, 0, 0.075);
-}
-
 .tooltip-area > div {
   width: 10px;
   height: 10px;
-  background: red;
 }

@@ -120,10 +120,14 @@ export class AreaChartComponent implements AfterViewInit {
       .append('circle')
       .attr('cx', (d: any) => x(d.ANNEE))
       .attr('cy', (d: any) => y(d.NB_LESION))
-      .attr('r', 10)
+      .attr('r', 6)
       .attr('fill', 'transparent')
       .style('z-index', 999)
+      .style('padding', '10px')
       .on('mouseover', function (event: Event, d: any) {
+        const circle = event.currentTarget as SVGElement;
+        circle.setAttribute('fill', color);
+
         const [xPos, yPos] = d3.pointer(event);
         tooltip.transition().duration(200).style('opacity', 1);
         tooltip
@@ -137,6 +141,8 @@ export class AreaChartComponent implements AfterViewInit {
       })
       .on('mouseout', function (event: Event, d: any) {
         tooltip.transition().duration(100).style('opacity', 0);
+        const circle = event.currentTarget as SVGElement;
+        circle.setAttribute('fill', 'transparent');
       });
   }
 }

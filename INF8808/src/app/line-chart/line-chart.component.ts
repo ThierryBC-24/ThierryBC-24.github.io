@@ -25,13 +25,13 @@ const RISK_NAMES: (keyof RisksData)[] = [
 })
 export class LineChartComponent implements OnInit {
   private svg: any;
-  private margin = { top: 50, right: 50, bottom: 50, left: 50 };
+  private margin = { top: 25, right: 25, bottom: 25, left: 25 };
   private width: number = 0;
   private height: number = 0;
   private colorScale = d3
     .scaleOrdinal()
     .domain(RISK_NAMES)
-    .range(d3.schemeCategory10); // Use a categorical color scheme
+    .range(d3.schemeCategory10);
 
   private xScale: any;
   private yScale: any;
@@ -41,35 +41,23 @@ export class LineChartComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeSvg();
-    this.drawLegend(RISK_NAMES);
     this.drawBackground();
     this.drawChart();
   }
 
   private initializeSvg(): void {
-    const container = document.getElementById(
-      'line-chart-container'
-    ) as HTMLElement;
-    const containerWidth = container.offsetWidth;
-    const containerHeight = container.offsetHeight;
+    const container = document.getElementById('line-chart') as HTMLElement;
 
-    const margin = {
-      top: 0.1 * containerHeight,
-      right: 0.2 * containerWidth,
-      bottom: 0.1 * containerHeight,
-      left: 0.1 * containerWidth,
-    };
-
-    this.width = containerWidth - margin.left - margin.right;
-    this.height = containerHeight - margin.top - margin.bottom;
+    this.width = container.offsetWidth - this.margin.left - this.margin.right;
+    this.height = container.offsetHeight - this.margin.top - this.margin.bottom;
 
     this.svg = d3
       .select('figure#line')
       .append('svg')
-      .attr('width', containerWidth)
-      .attr('height', containerHeight)
+      .attr('width', container.offsetWidth)
+      .attr('height', container.offsetHeight)
       .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+      .attr('transform', `translate(0, 0)`);
   }
 
   private drawChart(): void {
@@ -86,6 +74,7 @@ export class LineChartComponent implements OnInit {
         this.drawLines(parsedData, xScale, yScale);
         this.drawAxes(xScale, yScale);
         this.drawLabels();
+        this.drawLegend(RISK_NAMES);
       })
       .catch((error) => {
         console.log('Error loading the data: ' + error);
@@ -141,7 +130,7 @@ export class LineChartComponent implements OnInit {
     this.xScale = d3
       .scaleLinear()
       .domain([yearExtent[0] - padding, yearExtent[1] + padding])
-      .range([0, this.width]);
+      .range([this.margin.left, this.width - this.margin.right]);
 
     return this.xScale;
   }
@@ -157,7 +146,7 @@ export class LineChartComponent implements OnInit {
     this.yScale = d3
       .scaleLinear()
       .domain([minYValue, maxYValue + 5])
-      .range([this.height, 0]);
+      .range([this.height - this.margin.top, this.margin.bottom]);
 
     return this.yScale;
   }
@@ -207,31 +196,36 @@ export class LineChartComponent implements OnInit {
   private drawAxes(xScale: any, yScale: any): void {
     this.svg
       .append('g')
-      .attr('transform', `translate(0,${this.height})`)
+      .attr('transform', `translate(0,${this.height - this.margin.bottom})`)
       .call(
         d3
           .axisBottom(xScale)
           .ticks(7)
           .tickFormat((value) => value.toString())
           .tickSize(0)
-          .tickPadding(5)
+          .tickPadding(10)
       );
 
     this.svg
       .append('g')
+      .attr('transform', `translate(${this.margin.left},0)`)
       .call(
         d3
           .axisLeft(yScale)
-          .tickSize(-this.width)
+          .tickSize(-this.width + this.margin.left + this.margin.right)
           .tickFormat((value) => `${value}%`)
       )
       .attr('stroke-opacity', 0.2);
   }
 
   private drawLegend(risks: (keyof RisksData)[]): void {
-    const legend = this.svg
+    const legend = d3
+      .select('figure#legend-line-chart')
+      .append('svg')
+      .attr('width', 280)
+      .attr('height', 20 * 5 + 12 * 5)
       .append('g')
-      .attr('transform', `translate(${this.width + this.margin.right},${20})`);
+      .attr('transform', `translate(0,${this.margin.top})`);
 
     legend
       .selectAll('.legend-item')
@@ -241,7 +235,8 @@ export class LineChartComponent implements OnInit {
       .attr('class', 'legend-item')
       .attr('transform', (d: string, i: number) => `translate(0,${i * 20})`)
       .each(function (this: any, d: string) {
-        d3.select(this).classed(d, true);
+        d3.select(this)
+          .classed(d, true)
       });
 
     legend
@@ -249,38 +244,24 @@ export class LineChartComponent implements OnInit {
       .append('rect')
       .attr('width', 10)
       .attr('height', 10)
-      .attr('fill', (d: string) => this.colorScale(d));
+      .attr('fill', (d: any) => this.colorScale(d) as string);
 
     legend
       .selectAll('.legend-item')
       .append('text')
       .attr('x', 15)
       .attr('y', 10)
-      .text((d: string) => d);
+      .style('font-size', '12px')
+      .text((d: any) => d);
   }
 
   private drawLabels(): void {
     this.svg
       .append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - this.margin.left)
-      .attr('x', 0 - this.height / 2)
-      .attr('dy', '1em')
-      .style('text-anchor', 'middle');
-
-    this.svg
-      .append('text')
-      .attr('x', this.width / 2)
-      .attr('y', this.height + 40)
+      .attr('x', (this.width - this.margin.left) / 2)
+      .attr('y', this.margin.top - 5)
       .attr('text-anchor', 'middle')
-      .style('font-size', '16px');
-
-    this.svg
-      .append('text')
-      .attr('x', this.width / 2)
-      .attr('y', -20)
-      .attr('text-anchor', 'middle')
-      .style('font-size', '20px')
+      .style('font-size', '16px')
       .style('font-weight', 'bold')
       .text(
         'Évolution du nombre de lésions liés aux risques prioritaires (2016-2022)'
@@ -290,8 +271,13 @@ export class LineChartComponent implements OnInit {
   private drawBackground(): void {
     this.svg
       .append('rect')
-      .attr('width', (4 * this.width) / 7)
-      .attr('height', this.height)
+      .attr('x', this.margin.left)
+      .attr(
+        'width',
+        (4 * (this.width - this.margin.left - this.margin.right)) / 7
+      )
+      .attr('height', this.height - this.margin.top - this.margin.bottom)
+      .attr('y', this.margin.top)
       .attr('fill', 'silver')
       .style('opacity', 0.5);
   }

@@ -2,7 +2,27 @@ figure#line {
   margin: 0;
 }
 
+figure#legend-line-chart {
+  margin: 0;
+}
+
+#line-chart-div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 50%;
+  height: 75%;
+}
+
+#line-chart {
+  width: 100%;
+  height: 100%;
+}
+
 #line-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
 }

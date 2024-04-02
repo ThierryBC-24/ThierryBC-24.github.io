@@ -83,7 +83,7 @@ export class BubbleBarChartComponent implements OnInit {
   private setLinearRadiusScale(): d3.ScaleLinear<number, number>{
     return d3.scaleLinear()
     .domain([0, d3.max(this.data, d => d.nb_lesion) as number])
-    .range([0, 110]);
+    .range([5, 110]);
   }
 
   private setLogRadiusScale(): d3.ScaleLogarithmic<number, number>{
@@ -109,7 +109,7 @@ export class BubbleBarChartComponent implements OnInit {
       d.y = (this.yAxis as d3.ScaleLinear<number, number>)(60000) as number
       return (this.yAxis as d3.ScaleLinear<number, number>)(60000) as number
     })
-    .attr("r", (d: any) => (this.radiusScale as d3.ScaleLogarithmic<number, number>)(d.nb_lesion))
+    .attr("r", (d: any) => (this.radiusScale as d3.ScaleLinear<number, number>)(d.nb_lesion))
     .attr("opacity", 0.7)
     .style("fill", "#d04a35")
     .on("mouseenter", function(event: any) {
@@ -172,7 +172,7 @@ export class BubbleBarChartComponent implements OnInit {
     return d3.forceSimulation(this.data as d3.SimulationNodeDatum[])
       .force("x", d3.forceX().x((d: any) => (this.xAxis as d3.ScaleBand<string>)(d.categorie_genre) as number + (this.xAxis as d3.ScaleBand<string>).bandwidth() / 2))
       .force("y", d3.forceY().y((d: any) => (this.yAxis as d3.ScaleLinear<number, number>)(60000) as number))
-      .force("collide", d3.forceCollide((d: any) => { return (this.radiusScale as d3.ScaleLogarithmic<number, number>)(d.nb_lesion); }).iterations(10))
+      .force("collide", d3.forceCollide((d: any) => { return (this.radiusScale as d3.ScaleLinear<number, number>)(d.nb_lesion); }).iterations(10))
   }
 
   private simulate(simulation: any) {

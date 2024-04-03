@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input } from '@angular/core';
 import * as d3 from 'd3';
 
 type AgeData = {
@@ -11,105 +11,84 @@ type AgeData = {
   templateUrl: './waffle-chart.component.html',
   styleUrls: ['./waffle-chart.component.scss'],
 })
-export class WaffleChartComponent implements OnInit {
-  constructor() {}
-
+export class WaffleChartComponent implements AfterViewInit {
   private svg: any;
   private width = 0;
   private height = 0;
-  private data: AgeData[] = [];
-  private totalValue = 0;
-  private margin = { top: 10, right: 10, bottom: 10, left: 10 };
+  @Input() data!: AgeData;
+  @Input() totalValue!: number;
+  private marginTop = 25;
+  public groupAgeId: string = '';
+  constructor(private cdr: ChangeDetectorRef) { }
 
-  ngOnInit(): void {
-    d3.text('/assets/data/Viz 3/groupe_age_lesion.csv').then((data) => {
-      let rowIndex = 0;
-      const parsedData: AgeData[] = d3
-        .csvParseRows(data, (d: any) => {
-          rowIndex++;
-          if (rowIndex === 1) {
-            return null;
-          }
-          const columns = d[0].split(';');
-          return {
-            GROUPE_AGE: columns[0],
-            NB_LESION: +columns[1],
-          };
-        })
-        .filter((d) => d !== null) as AgeData[];
-      this.data = parsedData;
-      const container = document.getElementById('div-waffle-chart') as HTMLElement;
+  ngAfterViewInit(): void {
+    this.groupAgeId = 'figure-' + this.data.GROUPE_AGE.replace(/ /g, '-');
+    this.cdr.detectChanges();
+    const container = document.getElementById(this.data.GROUPE_AGE) as HTMLElement;
 
-      this.width = container.offsetWidth - this.margin.left - this.margin.right;
-      this.height = container.offsetHeight - this.margin.top - this.margin.bottom;
+    this.width = container.offsetWidth;
+    this.height = container.offsetHeight + this.marginTop;
 
 
-      this.createSvg();
-      this.data.forEach((d) => (this.totalValue += d.NB_LESION));
-      this.data.forEach((d, i) => this.drawWaffle(d, i));
-      this.drawLegend();
-    });
+    this.createSvg();
+    this.drawWaffle(this.data);
   }
 
   private createSvg(): void {
     this.svg = d3
-      .select('figure#waffle')
+      .select('#' + this.groupAgeId)
       .append('svg')
-      .attr('width', this.width - this.margin.left - this.margin.right)
-      .attr('height', this.height - this.margin.top - this.margin.bottom)
-      .append('g')
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('transform', `translate(0,0)`);
+
+    this.addAgeText(this.svg, this.data);
   }
 
-  private addAgeText(chart: any, data: AgeData, chartSize: number): void {
+  private addAgeText(chart: any, data: AgeData): void {
     const ageText = data.GROUPE_AGE.replace(/(\d+)/g, '$1 ANS');
     chart
       .append('text')
-      .attr('x', chartSize / 2)
-      .attr('y', -12)
+      .attr('x', this.width / 2)
+      .attr('y', this.marginTop/ 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('font-size', `${this.width * 0.0115}px`)
+      .attr('font-size', `${this.width * 0.08}px`)
       .attr('fill', '#00408B')
       .text(ageText);
   }
 
-  private addValueText(chart: any, data: AgeData, chartSize: number): void {
+  private addValueText(chart: any, data: AgeData): void {
     chart
       .append('text')
-      .attr('x', chartSize / 2)
-      .attr('y', chartSize / 2)
+      .attr('x', this.width / 2)
+      .attr('y', (this.height - this.marginTop) / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('font-size', `${this.width * 0.02}px`)
+      .attr('font-size', `${this.width * 0.1}px`)
       .attr('fill', '#00408B')
       .text(`${Math.round((100 * data.NB_LESION) / this.totalValue)}%`);
   }
 
-  private drawWaffle(data: AgeData, index: number): void {
+  private drawWaffle(data: AgeData): void {
     const rows = 10;
     const cols = 10;
-    const chartSpacing = this.width * 0.02;
-    const chartSize =
-      (this.width - (this.data.length + 2) * chartSpacing) / this.data.length;
 
     const waffle = this.svg
       .append('g')
       .attr(
         'transform',
-        `translate(${chartSpacing + index * (chartSize + chartSpacing)}, ${
-          (this.height - chartSize) / 2
-        })`
+        `translate(0, ${this.marginTop})`
       );
 
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         waffle
           .append('rect')
-          .attr('x', j * (chartSize / cols))
-          .attr('y', (rows - 1 - i) * (chartSize / rows))
-          .attr('width', chartSize / cols)
-          .attr('height', chartSize / rows)
+          .attr('x', j * (this.width / cols))
+          .attr('y', (rows - 1 - i) * ((this.height - this.marginTop) / rows))
+          .attr('width', this.width / cols)
+          .attr('height', this.height / rows)
           .attr(
             'fill',
             ((i * cols + j) * this.totalValue) / 100 < data.NB_LESION
@@ -121,26 +100,7 @@ export class WaffleChartComponent implements OnInit {
       }
     }
 
-    this.addAgeText(waffle, data, chartSize);
-    this.addValueText(waffle, data, chartSize);
-  }
+    this.addValueText(waffle, data);
 
-  private drawLegend(): void {
-    const chartSize =
-      (this.width - (this.data.length + 2) * this.width * 0.02) /
-      this.data.length;
-    const legendY =
-      (this.height - chartSize) / 2 + chartSize + this.height * 0.05;
-
-    const legend = this.svg
-      .append('g')
-      .attr('transform', `translate(${this.width / 2 - this.margin.right - this.margin.left}, ${legendY})`)
-      .attr('text-anchor', 'middle');
-
-    legend
-      .append('text')
-      .text(`1 carré = ${this.totalValue / 100} lésions`)
-      .attr('font-size', '18px')
-      .attr('fill', '#00408B');
   }
 }

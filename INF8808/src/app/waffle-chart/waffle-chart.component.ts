@@ -69,7 +69,7 @@ export class WaffleChartComponent implements OnInit {
       .attr('y', -12)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('font-size', `${this.width * 0.013}px`)
+      .attr('font-size', `${this.width * 0.0115}px`)
       .attr('fill', '#00408B')
       .text(ageText);
   }

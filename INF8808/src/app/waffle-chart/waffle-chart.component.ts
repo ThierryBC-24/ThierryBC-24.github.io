@@ -15,10 +15,11 @@ export class WaffleChartComponent implements OnInit {
   constructor() {}
 
   private svg: any;
-  private width = window.innerWidth;
-  private height = window.innerHeight;
+  private width = 0;
+  private height = 0;
   private data: DataType[] = [];
   private totalValue = 0;
+  private margin = { top: 10, right: 10, bottom: 10, left: 10 };
 
   ngOnInit(): void {
     d3.text('/assets/data/Viz 3/groupe_age_lesion.csv').then((data) => {
@@ -37,6 +38,11 @@ export class WaffleChartComponent implements OnInit {
         })
         .filter((d) => d !== null) as DataType[];
       this.data = parsedData;
+      const container = document.getElementById('div-waffle-chart') as HTMLElement;
+
+      this.width = container.offsetWidth - this.margin.left - this.margin.right;
+      this.height = container.offsetHeight - this.margin.top - this.margin.bottom;
+
 
       this.createSvg();
       this.data.forEach((d) => (this.totalValue += d.NB_LESION));
@@ -49,10 +55,10 @@ export class WaffleChartComponent implements OnInit {
     this.svg = d3
       .select('figure#waffle')
       .append('svg')
-      .attr('width', this.width - 24)
-      .attr('height', this.height - 24)
+      .attr('width', this.width - this.margin.left - this.margin.right)
+      .attr('height', this.height - this.margin.top - this.margin.bottom)
       .append('g')
-      .attr('transform', `translate(0,0)`);
+      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
   }
 
   private addAgeText(chart: any, data: DataType, chartSize: number): void {
@@ -128,7 +134,7 @@ export class WaffleChartComponent implements OnInit {
 
     const legend = this.svg
       .append('g')
-      .attr('transform', `translate(${this.width / 2}, ${legendY})`)
+      .attr('transform', `translate(${this.width / 2 - this.margin.right - this.margin.left}, ${legendY})`)
       .attr('text-anchor', 'middle');
 
     legend

@@ -38,11 +38,7 @@ export class WaffleChartContainerComponent implements OnInit {
         .filter((d) => d !== null) as AgeData[];
       this.data = parsedData;
       this.data.forEach((d) => (this.totalValue += d.NB_LESION));
+      this.legend = '1 carré = ' + this.totalValue / 100 + ' lésions';
     });
-    this.drawLegend();
-  }
-
-  private drawLegend(): void {
-    this.legend = '1 carré = ' + this.totalValue / 100 + ' lésions';
   }
 }

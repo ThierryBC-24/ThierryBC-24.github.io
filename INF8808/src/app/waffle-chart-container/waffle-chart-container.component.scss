@@ -1,6 +1,6 @@
 figure.waffle {
-    margin: 0;
-  }
+  margin: 0;
+}
 
 #container-waffle-chart {
   width: 100%;
@@ -14,17 +14,15 @@ figure.waffle {
   width: 75%;
   height: 75%;
   display: grid;
-  column-count: 7;
-  grid-auto-flow: column;
+  grid-template-columns: repeat(7, 1fr);
   column-gap: 20px;
   row-gap: 20px;
-  grid-template-columns: repeat(7, 1fr);
 }
 
 #waffle-legend {
   font-size: 18px;
-  color: #00408B;
+  color: #00408b;
   width: 100%;
   text-align: center;
-  //grid-column-start: 1;
+  grid-column: 1 / 8;
 }

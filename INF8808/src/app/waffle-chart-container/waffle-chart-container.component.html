@@ -1,17 +1,22 @@
 <div id="container-waffle-chart">
-    <div #div id="div-waffle-chart">
-        <div [ngStyle]="{
-                    'height.px': (div.offsetWidth / 7) - 20,
-                    'width.px': (div.offsetWidth / 7) - 20
-                    
-                }
-            " *ngFor="let item of this.data; let i = index;">
-            <app-waffle-chart [attr.id]="item.GROUPE_AGE" [data]="item"
-                [totalValue]="this.totalValue"></app-waffle-chart>
-        </div>
-        <div><p id="waffle-legend" [ngStyle]="{'width.px': div.offsetWidth}">{{this.legend}}</p></div>
-        
+  <div #div id="div-waffle-chart">
+    <div
+      [ngStyle]="{
+        'height.px': div.offsetWidth / 7 - 20,
+        'width.px': div.offsetWidth / 7 - 20
+      }"
+      *ngFor="let item of this.data; let i = index"
+    >
+      <app-waffle-chart
+        [attr.id]="item.GROUPE_AGE"
+        [data]="item"
+        [totalValue]="this.totalValue"
+      ></app-waffle-chart>
     </div>
-
-
+    <div id="waffle-legend" [ngStyle]="{ 'width.px': div.offsetWidth }">
+      <p>
+        {{ this.legend }}
+      </p>
+    </div>
+  </div>
 </div>

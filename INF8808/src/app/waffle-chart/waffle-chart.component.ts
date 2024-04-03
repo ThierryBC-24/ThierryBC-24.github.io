@@ -1,4 +1,9 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  Input,
+} from '@angular/core';
 import * as d3 from 'd3';
 
 type AgeData = {
@@ -19,16 +24,17 @@ export class WaffleChartComponent implements AfterViewInit {
   @Input() totalValue!: number;
   private marginTop = 25;
   public groupAgeId: string = '';
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngAfterViewInit(): void {
     this.groupAgeId = 'figure-' + this.data.GROUPE_AGE.replace(/ /g, '-');
     this.cdr.detectChanges();
-    const container = document.getElementById(this.data.GROUPE_AGE) as HTMLElement;
+    const container = document.getElementById(
+      this.data.GROUPE_AGE
+    ) as HTMLElement;
 
     this.width = container.offsetWidth;
     this.height = container.offsetHeight + this.marginTop;
-
 
     this.createSvg();
     this.drawWaffle(this.data);
@@ -50,10 +56,10 @@ export class WaffleChartComponent implements AfterViewInit {
     chart
       .append('text')
       .attr('x', this.width / 2)
-      .attr('y', this.marginTop/ 2)
+      .attr('y', this.marginTop / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('font-size', `${this.width * 0.08}px`)
+      .attr('font-size', `${this.width * 0.1}px`)
       .attr('fill', '#00408B')
       .text(ageText);
   }
@@ -65,7 +71,7 @@ export class WaffleChartComponent implements AfterViewInit {
       .attr('y', (this.height - this.marginTop) / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('font-size', `${this.width * 0.1}px`)
+      .attr('font-size', `${this.width * 0.13}px`)
       .attr('fill', '#00408B')
       .text(`${Math.round((100 * data.NB_LESION) / this.totalValue)}%`);
   }
@@ -76,10 +82,7 @@ export class WaffleChartComponent implements AfterViewInit {
 
     const waffle = this.svg
       .append('g')
-      .attr(
-        'transform',
-        `translate(0, ${this.marginTop})`
-      );
+      .attr('transform', `translate(0, ${this.marginTop})`);
 
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
@@ -101,6 +104,5 @@ export class WaffleChartComponent implements AfterViewInit {
     }
 
     this.addValueText(waffle, data);
-
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 
-type DataType = {
+type AgeData = {
   GROUPE_AGE: string;
   NB_LESION: number;
 };
@@ -17,14 +17,14 @@ export class WaffleChartComponent implements OnInit {
   private svg: any;
   private width = 0;
   private height = 0;
-  private data: DataType[] = [];
+  private data: AgeData[] = [];
   private totalValue = 0;
   private margin = { top: 10, right: 10, bottom: 10, left: 10 };
 
   ngOnInit(): void {
     d3.text('/assets/data/Viz 3/groupe_age_lesion.csv').then((data) => {
       let rowIndex = 0;
-      const parsedData: DataType[] = d3
+      const parsedData: AgeData[] = d3
         .csvParseRows(data, (d: any) => {
           rowIndex++;
           if (rowIndex === 1) {
@@ -36,7 +36,7 @@ export class WaffleChartComponent implements OnInit {
             NB_LESION: +columns[1],
           };
         })
-        .filter((d) => d !== null) as DataType[];
+        .filter((d) => d !== null) as AgeData[];
       this.data = parsedData;
       const container = document.getElementById('div-waffle-chart') as HTMLElement;
 
@@ -61,12 +61,12 @@ export class WaffleChartComponent implements OnInit {
       .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
   }
 
-  private addAgeText(chart: any, data: DataType, chartSize: number): void {
+  private addAgeText(chart: any, data: AgeData, chartSize: number): void {
     const ageText = data.GROUPE_AGE.replace(/(\d+)/g, '$1 ANS');
     chart
       .append('text')
       .attr('x', chartSize / 2)
-      .attr('y', -12) // position the text 10px above the chart
+      .attr('y', -12)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
       .attr('font-size', `${this.width * 0.013}px`)
@@ -74,7 +74,7 @@ export class WaffleChartComponent implements OnInit {
       .text(ageText);
   }
 
-  private addValueText(chart: any, data: DataType, chartSize: number): void {
+  private addValueText(chart: any, data: AgeData, chartSize: number): void {
     chart
       .append('text')
       .attr('x', chartSize / 2)
@@ -86,7 +86,7 @@ export class WaffleChartComponent implements OnInit {
       .text(`${Math.round((100 * data.NB_LESION) / this.totalValue)}%`);
   }
 
-  private drawWaffle(data: DataType, index: number): void {
+  private drawWaffle(data: AgeData, index: number): void {
     const rows = 10;
     const cols = 10;
     const chartSpacing = this.width * 0.02;
@@ -107,7 +107,7 @@ export class WaffleChartComponent implements OnInit {
         waffle
           .append('rect')
           .attr('x', j * (chartSize / cols))
-          .attr('y', (rows - 1 - i) * (chartSize / rows)) // flip the y position
+          .attr('y', (rows - 1 - i) * (chartSize / rows))
           .attr('width', chartSize / cols)
           .attr('height', chartSize / rows)
           .attr(

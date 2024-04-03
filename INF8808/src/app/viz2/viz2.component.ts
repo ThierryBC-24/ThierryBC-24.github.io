@@ -1,5 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import * as fs from "fs";
+import * as path from "path";
+import { parse } from 'csv-parse';
 import * as d3 from 'd3';
+
+interface Data {
+  bodyPart: string;
+  bodySeat: string;
+  nLesions: number;
+}
 
 @Component({
   selector: 'app-viz2',
@@ -59,8 +68,8 @@ export class Viz2Component implements OnInit {
 
   ngOnInit(): void {
     this.createSvg();
-    // this.drawBars(this.data);
-    this.drawGroupedBars(this.data);
+    const data: any[] = this.formatData(this.data);
+    this.drawGroupedBars(data);
   }
 
   private createSvg(): void {
@@ -72,135 +81,15 @@ export class Viz2Component implements OnInit {
     .attr("transform", "translate(" + this.margin + "," + this.margin + ")");
   }
 
-  private drawBars(data: any[]): void {
-    const x = d3.scaleLinear()
-      .domain([0, Math.max(...data.map(item => item.NLesions))])
-      .range([this.marginLeft, this.width - this.margin]);
-  
-    const y = d3.scaleBand()
-      .domain(data.map(d => d.BodySeat))
-      .rangeRound([this.margin, this.height - this.margin])
-      .padding(0.1);
-
-    // Rectangle for each bar
-    this.svg.append("g")
-      .attr("fill", "steelblue")
-      .selectAll()
-      .data(data)
-      .join("rect")
-        .attr("x", x(0))
-        .attr("y", (d: any) => y(d.BodySeat))
-        .attr("width", (d: any) => x(d.NLesions) - x(0))
-        .attr("height", y.bandwidth());
-
-    // x-axis
-    this.svg.append("g")
-      .attr("transform", `translate(0,${this.height - this.margin})`)
-      .call(d3.axisBottom(x).tickSizeOuter(0));
-  
-    // y-axis
-    this.svg.append("g")
-        .attr("transform", `translate(${this.marginLeft},0)`)
-        .call(d3.axisLeft(y).tickSizeOuter(0));
+  private formatData(data: any[]): any[] {
+    const lesions = data.map(item => item.NLesions);
+    const sum = lesions.reduce((acc, curr) => acc + curr, 0);
+    data.forEach(item => {
+      item.percent = item.NLesions/sum;
+    });
+    // TODO: ajouter les percent par body seats
+    return data;
   }
-
-  // private drawGroupedBars(data: any[]): void {
-  //   const barPadding = 100;
-
-  //   // Cumulative
-  //   var cummulative = 0;
-  //   data.forEach(function(val, i) {
-  //     val.cummulative = cummulative;
-  //     cummulative += 1;
-  //   });
-    
-  //   const y_bodyParts = d3.scaleLinear()
-  //     .range([this.marginLeft, this.width - this.margin]);
-
-  //   const y_bodySeats = d3.scaleBand().domain(data.map(d => d.BodySeat))
-  //     .rangeRound([0, this.width])
-  //     .padding(0.1);
-
-  //   const y_bodyParts_domain = y_bodySeats.bandwidth() * data.length;
-  //   y_bodyParts.domain([0, y_bodyParts_domain]);
-
-  //   const x = d3.scaleLinear()
-  //     .domain([0, Math.max(...data.map(item => item.NLesions))])
-  //     .range([this.marginLeft, this.width - this.margin]);
-
-  //   const bodyParts = new Set(data.map(d => d.BodyPart));
-  //   const color = d3.scaleOrdinal()
-  //     .domain(bodyParts)
-  //     .range(d3.schemeSpectral[bodyParts.size])
-  //     .unknown("#ccc");
-
-  //   const bodyPart_g = this.svg.selectAll(".bodypart")
-  //     .data(data)
-  //     .enter().append("g")
-  //     .attr("class", function(d: any) {
-  //       return 'bodypart bodypart-' + d.BodyPart;
-  //     })
-  //     .attr("transform", function(d: any) { // offset by inner group size
-  //       var y_group = y_bodyParts((d.cummulative * y_bodySeats.bandwidth()));
-  //       return "translate(" + y_group + ",0)";
-  //     })
-  //     .attr("fill", function(d: any) { // make child elements of group "inherit" this fill
-  //       return color(d.BodyPart);
-  //     });
-
-  //   const bodySeat_g = bodyPart_g.selectAll(".bodyseat")
-  //     .data(d3.group(data, d => d.NLesions))
-  //     .enter().append("g")
-  //     .attr("class", function(d: any) {
-  //       return 'bodyseat bodyseat-' + d.BodySeat;
-  //     })
-  //     .attr("transform", function(d: any, i: any) { // offset by index
-  //       return "translate(" + y_bodyParts((i * y_bodySeats.bandwidth())) + ",0)";
-  //     });
-
-  //   const bodyPart_label = bodyPart_g.selectAll(".bodypart-label")
-  //     .data(d3.group(data, d => d.BodyPart))
-  //     .enter().append("text")
-  //     .attr("class", function(d: any) {
-  //       // console.log(d)
-  //       return 'bodypart-label bodypart-label-' + d.BodyPart;
-  //     })
-  //     .attr("transform", (d: any) => {
-  //       var x_label = y_bodyParts((d.length * y_bodySeats.bandwidth() + barPadding) / 2);
-  //       var y_label = this.height + 30;
-  //       return "translate(" + x_label + "," + y_label + ")";
-  //     })
-  //     .text(function(d: any) {
-  //       return d.BodyPart;
-  //     })
-  //     .attr('text-anchor', 'middle');
-    
-  //    var bodySeat_label = bodySeat_g.selectAll(".bodyseat-label")
-  //      .data(d3.group(data, d => d.BodySeat))
-  //      .enter().append("text")
-  //      .attr("class", function(d: any) {
-  //       //  console.log(d)
-  //        return 'bodyseat-label bodyseat-label-' + d.key;
-  //      })
-  //      .attr("transform", (d: any) => {
-  //        var x_label = y_bodyParts((y_bodySeats.bandwidth() + barPadding) / 2);
-  //        var y_label = this.height + 10;
-  //        return "translate(" + x_label + "," + y_label + ")";
-  //      })
-  //      .text(function(d: any) {
-  //        return d.BodySeat;
-  //       })
-  //       .attr('text-anchor', 'middle');
-
-  //   // const rects = bodySeat_g.selectAll('.rect')
-  //   //   .data(data)
-  //   //   .enter().append("rect")
-  //   //   .attr("class", "rect")
-  //   //   .attr("height", y_bodyParts(y_bodySeats.bandwidth() - barPadding))
-  //   //   .attr("y", (d: any) => y_bodyParts(barPadding))
-  //   //   .attr("x", (d: any) => x(d.NLesions))
-  //   //   .attr("width", (d: any) => this.width - x(d.NLesions));
-  // }
 
   private drawGroupedBars(data: any[]): void {
     const bodyParts = new Set(data.map(d => d.BodyPart));
@@ -229,7 +118,7 @@ export class Viz2Component implements OnInit {
       .range(d3.schemeSpectral[bodyParts.size])
       .unknown("#ccc");
 
-    console.log(data.map(item => item.NLesions));
+    // console.log(data.map(item => item.NLesions));
 
     this.svg.append("g")
       .selectAll()

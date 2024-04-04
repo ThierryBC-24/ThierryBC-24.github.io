@@ -88,24 +88,36 @@ export class Viz2Component implements OnInit {
       item.percent = item.NLesions/sum;
     });
     // TODO: ajouter les percent par body seats
+    // const grouped = data.reduce((groups, item) => {
+    //   (groups[item.BodyPart] ||= []).push(item);
+    //   return groups;
+    // }, {});
+    // const groupedBodyPart: any[] = [];
+    // grouped.forEach((group: any[]) => {
+    //   const lesionsSeat = group.map(item => item.NLesions);
+    //   const sumSeat = lesionsSeat.reduce((acc, curr) => acc + curr, 0);
+    //   groupedBodyPart.push({ bodyPart: sumSeat/sum });
+    // });
+    // console.log(groupedBodyPart);
+    console.log(data.map(d => d.percent));
     return data;
   }
 
   private drawGroupedBars(data: any[]): void {
     const bodyParts = new Set(data.map(d => d.BodyPart));
-    const onlyBodyParts = data.map(d => d.BodyPart);
+
     let cummul = 0;
-    const occurences = onlyBodyParts.reduce((acc, curr) => {
+    const occurences = (data.map(d => d.BodyPart)).reduce((acc, curr) => {
       return acc[curr] ? acc[curr] : acc[curr] = cummul++, acc
     }, {});
 
-    const padding = 20;
+    const scaleBreak = 0.15;
 
     // const x = d3.scaleLinear()
     //   .domain([0, Math.max(...data.map(item => item.NLesions)) + 10000])
     //   .range([0, this.width - this.margin]);
     const x = d3.scaleLinear()
-      .domain([0, 20000, 20000, Math.max(...data.map(item => item.NLesions)) + 20000])
+      .domain([0, scaleBreak, scaleBreak, 0.6])
       .range([0, (this.width - this.margin) - 400, (this.width - this.margin) - 400, this.width - this.margin]);
     
     const y = d3.scaleBand()
@@ -136,7 +148,7 @@ export class Viz2Component implements OnInit {
         // .attr("height", this.barHeight)
         .attr("width", (d: any) => {
           // console.log(x(d.NLesions));
-          return x(d.NLesions);
+          return x(d.percent);
         })
         .attr("fill", (d: any) => color(d.BodyPart));
 
@@ -148,7 +160,14 @@ export class Viz2Component implements OnInit {
       .attr("transform", `translate(${this.marginLeft},${this.height})`)
       .call(d3.axisBottom(x)
               // .tickSizeOuter(0)
-              .tickValues([2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 45000, 70000]));
+              .tickValues([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45]));
+              // .tickValues([2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 45000, 70000]));
+    
+    this.svg.append("text")
+      .attr("class", "x label")
+      .attr("x", this.width/2)
+      .attr("y", this.height + 35)
+      .text("Répartition relative (en %)");
     
     // y-axis
     const y_axis = this.svg.append("g")
@@ -166,23 +185,59 @@ export class Viz2Component implements OnInit {
         }
     );
 
+    this.svg.append('line')
+      .style("stroke", "black")
+      .style("stroke-width", 1)
+      .attr("x1", this.marginLeft)
+      .attr("y1", this.margin)
+      .attr("x2", this.marginLeft)
+      .attr("y2", this.height);
+
     // Première option
     this.svg.append('line')
       .style("stroke", "black")
       .style("stroke-width", 2)
       .attr('stroke-dasharray', ('3,3'))
-      .attr("x1", x(20000) + this.marginLeft)
+      .attr("x1", x(scaleBreak) + this.marginLeft)
       .attr("y1", this.margin)
-      .attr("x2", x(20000) + this.marginLeft)
+      .attr("x2", x(scaleBreak) + this.marginLeft)
       .attr("y2", this.height);  
 
-  // Deuxième option
-  //   this.svg.append("rect")
-  //     .style('opacity', 0.5)
-  //     .attr("x", x(20000) + this.marginLeft)
-  //     .attr("y", this.margin)
-  //     .attr("height", this.height - this.margin)
-  //     .attr("width", x(50000) - x(20000));  
+    // Deuxième option
+    //   this.svg.append("rect")
+    //     .style('opacity', 0.5)
+    //     .attr("x", x(scaleBreak) + this.marginLeft)
+    //     .attr("y", this.margin)
+    //     .attr("height", this.height - this.margin)
+    //     .attr("width", x(scaleBreak + 0.1) - x(scaleBreak));  
+
+    // Legend
+    this.drawLegend(bodyParts, color);
+    
+  }
+  
+  private drawLegend(bodyParts: Set<any>, color: d3.ScaleOrdinal<string, unknown, string>) {
+    const size = 15;
+    const spacingLegend = 15;
+    this.svg.selectAll("mydots")
+      .data(bodyParts)
+      .enter()
+      .append("rect")
+        .attr("x", this.width - this.margin - 100)
+        .attr("y", (d: any, i: number) => this.margin + i * (size + spacingLegend))
+        .attr("width", size)
+        .attr("height", size)
+        .style("fill", (d: any) => color(d));
+  
+    this.svg.selectAll("mylabels")
+      .data(bodyParts)
+      .enter()
+      .append("text")
+        .attr("x", this.width - this.margin + size * 1.2 - 100)
+        .attr("y", (d: any, i: number) => this.margin + i * (size + spacingLegend) + (size/1.5))
+        .text((d: any) => d)
+        .attr("text-anchor", "left")
+        .style("alignment-baseline", "middle");
   }
 
 }

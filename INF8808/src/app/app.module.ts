@@ -5,18 +5,19 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WaffleChartContainerComponent } from './waffle-chart-container/waffle-chart-container.component';
 import { WaffleChartComponent } from './waffle-chart/waffle-chart.component';
+import { AreaChartComponent } from './area-chart/area-chart.component';
+import { AreaChartContainerComponent } from './area-chart-container/area-chart-container.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     WaffleChartContainerComponent,
     WaffleChartComponent,
+    AreaChartComponent,
+    AreaChartContainerComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-  ],
+  imports: [BrowserModule, AppRoutingModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

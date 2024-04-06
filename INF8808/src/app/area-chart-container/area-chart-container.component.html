@@ -1,0 +1,70 @@
+<div class="area-graph">
+  <div class="baisse">
+    <div class="title">
+      <h2>SECTEURS EN BAISSE</h2>
+      <div></div>
+    </div>
+    <div class="container">
+      <span
+        #chart
+        *ngFor="
+          let datapoint of this.groupByCategory(colors.DECREASING);
+          let index = index
+        "
+      >
+        <app-area-chart
+          [data]="datapoint.data"
+          [sector]="datapoint.SECTEUR_SCIAN"
+          [color]="colors.DECREASING"
+          [id]="index"
+        ></app-area-chart>
+      </span>
+    </div>
+  </div>
+
+  <div class="stable">
+    <div class="title">
+      <h2>SECTEURS STABLES</h2>
+      <div></div>
+    </div>
+    <div class="container">
+      <span
+        #chart
+        *ngFor="
+          let datapoint of this.groupByCategory(colors.STABLE);
+          let index = index
+        "
+      >
+        <app-area-chart
+          [data]="datapoint.data"
+          [sector]="datapoint.SECTEUR_SCIAN"
+          [color]="colors.STABLE"
+          [id]="index + 100"
+        ></app-area-chart>
+      </span>
+    </div>
+  </div>
+
+  <div class="hausse">
+    <div class="title">
+      <h2>SECTEURS EN HAUSSE</h2>
+      <div></div>
+    </div>
+    <div class="container">
+      <span
+        #chart
+        *ngFor="
+          let datapoint of this.groupByCategory(colors.INCREASING);
+          let index = index
+        "
+      >
+        <app-area-chart
+          [data]="datapoint.data"
+          [sector]="datapoint.SECTEUR_SCIAN"
+          [id]="index + 1000"
+          [color]="colors.INCREASING"
+        ></app-area-chart>
+      </span>
+    </div>
+  </div>
+</div>

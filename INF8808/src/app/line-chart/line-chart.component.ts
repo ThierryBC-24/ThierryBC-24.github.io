@@ -235,8 +235,7 @@ export class LineChartComponent implements OnInit {
       .attr('class', 'legend-item')
       .attr('transform', (d: string, i: number) => `translate(0,${i * 20})`)
       .each(function (this: any, d: string) {
-        d3.select(this)
-          .classed(d, true)
+        d3.select(this).classed(d, true);
       });
 
     legend
@@ -300,34 +299,70 @@ export class LineChartComponent implements OnInit {
       const data: RisksData = d3.select(circle).datum() as RisksData;
       let g = d3.select(circle.parentNode as SVGGElement);
 
-      let nextYearData = this.data.find((d) => d.ANNEE === data.ANNEE + 1);
+      const defs = this.svg.append('defs');
+      const filter = defs.append('filter').attr('id', 'dropshadow');
 
-      let tooltipText = g
+      filter
+        .append('feGaussianBlur')
+        .attr('in', 'SourceAlpha')
+        .attr('stdDeviation', 4)
+        .attr('result', 'blur');
+      filter
+        .append('feOffset')
+        .attr('in', 'blur')
+        .attr('dx', 2)
+        .attr('dy', 2)
+        .attr('result', 'offsetBlur');
+
+      var feMerge = filter.append('feMerge');
+
+      feMerge.append('feMergeNode').attr('in', 'offsetBlur');
+      feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      let group = g.append('g').attr('class', 'tooltip');
+      let colorRect = group
+        .append('rect')
+        .attr('y', circle.cy.baseVal.value - 15 - 10)
+        .attr('width', 10)
+        .attr('height', 10)
+        .style('fill', this.colorScale(risk) as string);
+
+      let tooltipText = group
         .append('text')
-        .attr(
-          'x',
-          nextYearData ? circle.cx.baseVal.value : circle.cx.baseVal.value - 150
-        )
         .attr('y', circle.cy.baseVal.value - 15)
-        .text(`Année: ${data.ANNEE}, Risque: ${data[risk].toFixed(2)}%`)
+        .text(`${data.ANNEE} - ${data[risk].toFixed(2)}%`)
         .attr('class', 'tooltip')
-        .style('fill', this.colorScale(risk) as string)
-        .style('font-weight', 'bold')
         .style('font-size', '18px')
         .style('opacity', '1');
 
-      let bbox = (tooltipText.node() as SVGTextElement).getBBox();
+      let bbox = (group.node() as SVGTextElement).getBBox();
 
-      g.insert('rect', 'text')
-        .attr('x', bbox.x - 2)
+      let newX = circle.cx.baseVal.value - 45;
+      if (newX < 21) {
+        newX = 21;
+      } else if (newX + bbox.width > this.width) {
+        newX = this.width - bbox.width;
+      }
+
+      tooltipText.attr('x', newX);
+      colorRect.attr('x', newX - 15);
+      colorRect.raise();
+
+      bbox = (group.node() as SVGTextElement).getBBox();
+
+      group.insert('rect', 'text')
+        .attr('x', bbox.x - 5)
         .attr('y', bbox.y - 2)
-        .attr('width', bbox.width + 4)
+        .attr('width', bbox.width + 10)
         .attr('height', bbox.height + 4)
         .style('fill', 'white')
-        .style('opacity', 0.8)
+        .style('opacity', '1')
+        .attr('rx', 4)
+        .attr('ry', 4)
+        .attr('filter', 'url(#dropshadow)')
         .attr('class', 'tooltip');
 
-      tooltipText.raise();
+      g.raise();
     }
   }
 

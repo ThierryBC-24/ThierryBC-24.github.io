@@ -15,11 +15,17 @@ export class BubbleBarChartComponent implements OnInit {
   private svg: any;
   private margin = 150;
   private width = 1500;
-  private height = 400;
+  private height = 500;
 
   private xAxis: d3.ScaleBand<string> | undefined;
   private yAxis: d3.ScaleLinear<number, number> | undefined;
   private radiusScale: d3.ScaleLinear<number, number> | undefined;
+
+  private options = [
+    'QUELLES NATURES DE LA LÉSION SURVIENNENT LE PLUS FRÉQUEMMENT?',
+    'QUELS GENRES D\'ACCIDENTS SONT LES PLUS FRÉQUENTS?',
+  ];
+  private currentOptionIndex = 0;
 
   constructor() { }
 
@@ -46,7 +52,14 @@ export class BubbleBarChartComponent implements OnInit {
       this.createSvg();
       this.drawBubble();
       this.drawXAxis();
-      this.drawYAxis();
+      // this.drawYAxis();
+      const button = this.drawButton();
+
+      button.on('click', () => {
+        this.currentOptionIndex = (this.currentOptionIndex === 0 ? 1 : 0)
+        // build(data, 1000, currentYear, radiusScale, colorScale, xScale, yScale)
+        this.svg.select('.button').select('.button-text').text('VOIR ' + this.options[this.currentOptionIndex])
+      })
 
       const simulation = this.getSimulation()
       this.simulate(simulation)
@@ -56,13 +69,18 @@ export class BubbleBarChartComponent implements OnInit {
   private createSvg(): void {
     this.svg = d3.select("figure#bar")
     .append("svg")
-    // static
+
+    // static sizing
+    
     // .attr("width", this.width + (this.margin * 2))
     // .attr("height", this.height + (this.margin * 2))
-    // dynamic
-    .attr("viewBox", `0 0 ${this.width + (this.margin * 2)} ${this.height + (this.margin * 2)}`)
+
+    // dynamic sizing
+
+    .attr("viewBox", `0 0 ${this.width + (this.margin * 2)} ${this.height + (this.margin * 3)}`)
+
     .append("g")
-    .attr("transform", "translate(" + this.margin / 2 + "," + 20 + ")");
+    .attr("transform", "translate(" + this.margin / 2 + "," + 50 + ")");
   }
 
   // Scales
@@ -83,7 +101,7 @@ export class BubbleBarChartComponent implements OnInit {
   private setLinearRadiusScale(): d3.ScaleLinear<number, number>{
     return d3.scaleLinear()
     .domain([0, d3.max(this.data, d => d.nb_lesion) as number])
-    .range([5, 110]);
+    .range([3, 110]);
   }
 
   private setLogRadiusScale(): d3.ScaleLogarithmic<number, number>{
@@ -128,13 +146,44 @@ export class BubbleBarChartComponent implements OnInit {
     .call(d3.axisBottom(this.xAxis as d3.ScaleBand<string>))
     .selectAll("text")
     .attr("transform", "translate(-10,0)rotate(-45)")
-    .style("text-anchor", "end");
+    .style("text-anchor", "end")
+    .attr('font-size', '0.8rem');
   }
 
   private drawYAxis(): void {
     // Draw the Y-axis on the DOM
     this.svg.append("g")
     .call(d3.axisLeft(this.yAxis as d3.ScaleLinear<number, number>));
+  }
+
+  private drawButton(): any {
+    const button = this.svg.append('g')
+      .attr('class', 'button')
+
+    button.append('rect')
+    .attr('width', 400)
+    .attr('height', 30)
+    .attr('y', -15)
+    .attr('fill', '#f4f6f4')
+    .on('mouseenter', function (event: any) {
+      d3.select(event.target).attr('stroke', '#362023')
+    })
+    .on('mouseleave', function (event: any) {
+      d3.select(event.target).attr('stroke', '#f4f6f4')
+    });
+
+    button.append('text')
+    .attr('x', 200)
+    .attr('y', 0)
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'middle')
+    .attr('class', 'button-text')
+    .text('VOIR ' + this.options[this.currentOptionIndex])
+    .attr('font-size', '0.6rem')
+    .attr('fill', '#362023')
+    .attr('font-family', 'sans-serif');
+
+    return button
   }
 
   // Simulation

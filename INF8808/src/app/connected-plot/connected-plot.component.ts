@@ -15,10 +15,10 @@ export class ConnectedPlotComponent implements OnInit {
 
   private svg: any;
   private margin = {top: 90, right: 15, bottom: 50, left: 550};
-  private width = window.innerWidth - this.margin.left - this.margin.right;
-  private height = window.innerHeight - this.margin.top - this.margin.bottom;
+  private width = 0;
+  private height = 0;
 
-  private y = d3.scaleBand().range([0, this.height])
+  private y = d3.scaleBand().range([0, this.height]);
   private xRange = [50, this.width-100];
   private x = d3.scaleLinear().range(this.xRange);
 
@@ -94,13 +94,22 @@ export class ConnectedPlotComponent implements OnInit {
 
 // Create Svg
   private createSvg(): void {
+    const container = document.getElementById('connected-plot') as HTMLElement;
+    this.width = container.offsetWidth - this.margin.left - this.margin.right;
+    this.height = container.offsetHeight - this.margin.top - this.margin.bottom;
+
+    
     this.svg = d3
       .select('figure#connectedPlot')
       .append('svg')
-      .attr('width', this.width + this.margin.left + this.margin.right)
-      .attr('height', this.height + this.margin.top + this.margin.bottom)
+      .attr('width', container.offsetWidth)
+      .attr('height', container.offsetHeight)
       .append('g')
       .attr('transform', "translate(" + this.margin.left + "," + this.margin.top + ")");
+
+      this.y = d3.scaleBand().range([0, this.height])
+      this.xRange = [50, this.width-100];
+      this.x = d3.scaleLinear().range(this.xRange);
   }
 
 // Set axes (x and y)

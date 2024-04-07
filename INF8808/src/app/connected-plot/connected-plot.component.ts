@@ -174,7 +174,7 @@ export class ConnectedPlotComponent implements OnInit {
 
     let yPosData : any[]= []
     let numberOfHorizontalLines = data.length
-    for (let i = 0; i < numberOfHorizontalLines; i++) {
+    for (let i = -0.5; i < numberOfHorizontalLines; i++) {
       yPosData.push((i+0.5)*this.height/numberOfHorizontalLines)
     }
       

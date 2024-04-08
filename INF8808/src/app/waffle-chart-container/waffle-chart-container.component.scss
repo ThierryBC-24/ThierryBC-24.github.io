@@ -1,0 +1,28 @@
+figure.waffle {
+  margin: 0;
+}
+
+#container-waffle-chart {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#div-waffle-chart {
+  width: 75%;
+  height: 75%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  column-gap: 20px;
+  row-gap: 20px;
+}
+
+#waffle-legend {
+  font-size: 18px;
+  color: #00408b;
+  width: 100%;
+  text-align: center;
+  grid-column: 1 / 8;
+}

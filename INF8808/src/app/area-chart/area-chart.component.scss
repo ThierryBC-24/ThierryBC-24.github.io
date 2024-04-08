@@ -1,0 +1,21 @@
+.sector {
+  text-align: center;
+  color: black;
+  font-size: 0.6rem;
+  width: 150px;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 5px;
+}
+
+figure {
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}

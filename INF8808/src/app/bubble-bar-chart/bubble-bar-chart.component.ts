@@ -205,6 +205,7 @@ export class BubbleBarChartComponent implements OnInit {
     })
 
     const text = button.append('text')
+    .style("pointer-events", "none")
     .attr('class', 'button-text')
     .on('mouseenter', () => {
       this.svg.select('.button').select('rect').attr('stroke', '#362023')
@@ -232,6 +233,7 @@ export class BubbleBarChartComponent implements OnInit {
 
   private drawTitle(): void {
     this.svg.append('text')
+    .style("pointer-events", "none")
     .attr('x', this.width / 2)
     .attr('y', 0)
     .attr('text-anchor', 'middle')
@@ -278,11 +280,10 @@ export class BubbleBarChartComponent implements OnInit {
       .style("font-size", "0.8rem")
       .style('position', 'absolute')
       .style("pointer-events", "none")
-      .style("opacity", 1)
-      .style("box-shadow", "0 4px 6px rgba(0, 0, 0, 0.1)")
+      .style("box-shadow", "0 4px 6px rgba(0, 0, 0, 0.1)");
       
     html.style("left", event.target.getBoundingClientRect().left + event.target.getBoundingClientRect().width / 2 - html.node().clientWidth / 2 + "px")
-    .style("top", event.target.getBoundingClientRect().top - 25 + "px")
+    .style("top", event.target.getBoundingClientRect().top + window.scrollY - 25 + "px");
   }
 
   private hideTooltip(event: any) {
@@ -296,10 +297,10 @@ export class BubbleBarChartComponent implements OnInit {
 
   private drawLegend() {
     const legend = this.svg.append('g')
-    .attr('class', 'button')
+    .attr('class', 'legend')
     .attr('transform', "translate(" + (this.width + this.margin) + "," + 300 + ")");
 
-    const bubbles = legend.selectAll(".bubble-legend")
+    legend.selectAll(".bubble-legend")
     .data([100, 50000, 100000, 200000])
     .enter()
     .append("circle")

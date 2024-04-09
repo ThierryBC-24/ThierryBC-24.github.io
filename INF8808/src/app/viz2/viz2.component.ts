@@ -58,6 +58,21 @@ export class Viz2Component implements OnInit {
     const paddingBars = 0.3;
     const paddingBodyParts = 20;
 
+    const mouseover = (d: any) => {
+      console.log(d.target);
+      // var subgroupName = d3.select().datum().key; // This was the tricky part
+      // d3.selectAll(".myRect").style("opacity", 0.2)
+      // d3.selectAll("."+subgroupName)
+      //   .style("opacity", 1)
+    }
+  
+    // When user do not hover anymore
+    const mouseleave = (d: any) => {
+      // console.log(d);
+      // d3.selectAll(".myRect")
+      //   .style("opacity",0.8)
+    }
+
     const x = d3.scaleLinear()
       .domain([0, scaleBreak, scaleBreak, 0.5])
       .range([0, this.width - 400 - this.legendWidth, this.width - 400 - this.legendWidth, this.width - this.legendWidth]);
@@ -84,6 +99,7 @@ export class Viz2Component implements OnInit {
       .selectAll()
       .data(([, d]: any) => d)
       .join("rect")
+        .attr("class", "small-bars")
         .attr("x", x(0))
         .attr("y", (d: any) => y(d.BodySeat))
         .attr("height", y.bandwidth())
@@ -106,11 +122,14 @@ export class Viz2Component implements OnInit {
       .data(([, d]: any) => d)
       .join("rect")
         .style('opacity', 0.5)
+        .attr("class", "big-bars")
         .attr("x", (d: any) => x(0))
         .attr("y", (d: any) => 0)
         .attr("height", (d: any) => (y.bandwidth() + paddingBarsLength) * d.height + paddingBodyParts/2)
         .attr("width", (d: any) => x(d.percent))
-        .attr("fill", (d: any) => color(d.BodyPart));
+        .attr("fill", (d: any) => color(d.BodyPart))
+      .on("mouseover", mouseover)
+      .on("mouseleave", mouseleave);
 
     // x-axis
     this.svg.append("g")

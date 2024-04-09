@@ -101,13 +101,7 @@ export class Viz2Component implements OnInit {
   }
 
   private drawGroupedBars(data: any[], bodyPartsData: any): void {
-    const bodyParts = new Set(data.map(d => d.BodyPart));
-
-    let cummul = 0;
-    // TODO: simplifier occurences juste des index
-    const occurences = (data.map(d => d.BodyPart)).reduce((acc, curr) => {
-      return acc[curr] ? acc[curr] : acc[curr] = cummul++, acc
-    }, {});
+    const bodyParts = Array.from(new Set(data.map(d => d.BodyPart)));
 
     const scaleBreak = 0.15;
     const paddingBars = 0.3;
@@ -119,33 +113,23 @@ export class Viz2Component implements OnInit {
 
     const y = d3.scaleBand()
       .domain(data.map(d => d.BodySeat))
-      .rangeRound([this.margin, this.height - (bodyParts.size - 1) * paddingBodyParts])
-      // .rangeRound([this.margin, this.height - this.margin - (bodyParts.size - 3) * paddingBodyParts])
+      .rangeRound([this.margin, this.height - (bodyParts.length - 1) * paddingBodyParts])
       .padding(paddingBars);
 
     const paddingBarsLength = ((y.range()[1] - y.range()[0]) * paddingBars)/(data.map(d => d.BodySeat)).length;
 
-    const z = d3.scaleBand()
-      .domain(bodyPartsData.map((d: any) => d.BodyPart))
-      .rangeRound([this.margin, this.height - (bodyParts.size - 1) * paddingBodyParts])
-    // console.log(y(data[1].BodySeat));
-    // console.log(z(bodyPartsData[1].BodyPart));
-
     const color = d3.scaleOrdinal()
       .domain(bodyParts)
-      .range(d3.schemeSpectral[bodyParts.size])
+      .range(d3.schemeSpectral[bodyParts.length])
       .unknown("#ccc");
 
     this.svg.append("g")
       .selectAll()
       .data(d3.group(data, d => d.BodyPart))
       .join("g")
-        .attr("transform", ([bodyPart,d]: any[]) => {
-          return `translate(${this.marginLeft},${(occurences[bodyPart] - 1) * paddingBodyParts})`;
+        .attr("transform", ([bodyPart,]: any[]) => {
+          return `translate(${this.marginLeft},${bodyParts.indexOf(bodyPart) * paddingBodyParts})`;
         })
-        // .attr("transform", ([bodyPart,d]: any[]) => {
-        //   return `translate(${this.marginLeft},${(occurences[bodyPart] - 1) * paddingBodyParts})`;
-        // })
       .selectAll()
       .data(([, d]: any) => d)
       .join("rect")
@@ -155,7 +139,6 @@ export class Viz2Component implements OnInit {
         .attr("width", (d: any) => x(d.percent))
         .attr("fill", (d: any) => color(d.BodyPart));
 
-    let previousHeight = 0;
     let totalHeights = 0
     this.svg.append("g")
       .selectAll()
@@ -164,7 +147,7 @@ export class Viz2Component implements OnInit {
         .attr("transform", ([bodyPart, d]: any[]) => {
           let a = y(data[totalHeights].BodySeat);
           if (!a) a = 0;
-          const translate = `translate(${this.marginLeft},${a + (occurences[bodyPart] - 1) * paddingBodyParts - paddingBodyParts/4})`;
+          const translate = `translate(${this.marginLeft},${a + bodyParts.indexOf(bodyPart) * paddingBodyParts - paddingBodyParts/4})`;
           totalHeights += d[0].height;
           return translate;
         })
@@ -203,7 +186,7 @@ export class Viz2Component implements OnInit {
         .attr("transform", (d: any) => {
           let a = y(d.BodySeat);
           if (!a) a = 0;
-          return `translate(0,${(occurences[d.BodyPart] - 1) * paddingBodyParts + a})`;
+          return `translate(0,${bodyParts.indexOf(d.BodyPart) * paddingBodyParts + a})`;
         }
     );
 
@@ -237,7 +220,7 @@ export class Viz2Component implements OnInit {
     this.drawLegend(bodyParts, color);
   }
   
-  private drawLegend(bodyParts: Set<any>, color: d3.ScaleOrdinal<string, unknown, string>) {
+  private drawLegend(bodyParts: Array<any>, color: d3.ScaleOrdinal<string, unknown, string>) {
     const size = 15;
     const spacingLegend = 15;
     this.svg.selectAll("mydots")

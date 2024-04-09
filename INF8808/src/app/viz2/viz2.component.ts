@@ -182,7 +182,8 @@ export class Viz2Component implements OnInit {
     this.svg.append("g")
       .attr("transform", `translate(${this.marginLeft},${this.height})`)
       .call(d3.axisBottom(x)
-              .tickValues([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45]));
+              .tickValues([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45])
+              .tickFormat(d3.format(".0%")));
     
     this.svg.append("text")
       .attr("class", "x label")

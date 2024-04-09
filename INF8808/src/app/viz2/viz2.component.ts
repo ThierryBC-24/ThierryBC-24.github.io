@@ -58,6 +58,8 @@ export class Viz2Component implements OnInit {
     const paddingBars = 0.3;
     const paddingBodyParts = 20;
     const opacityBigBars = 0.5;
+    const percentFontSize = "12px";
+    const percentFormat = d3.format(".0%");
 
     const x = d3.scaleLinear()
       .domain([0, scaleBreak, scaleBreak, 0.5])
@@ -76,23 +78,7 @@ export class Viz2Component implements OnInit {
       // .range(d3.schemeSpectral[bodyParts.length])
       .unknown("#ccc");
 
-    this.svg.append("g")
-      .selectAll()
-      .data(d3.group(data, d => d.BodyPart))
-      .join("g")
-        .attr("transform", ([bodyPart,]: any[]) => {
-          return `translate(${this.marginLeft},${bodyParts.indexOf(bodyPart) * paddingBodyParts})`;
-        })
-      .selectAll()
-      .data(([, d]: any) => d)
-      .join("rect")
-        .attr("class", (d: any) => "small-bars " + d.BodyPart)
-        .attr("x", x(0))
-        .attr("y", (d: any) => y(d.BodySeat))
-        .attr("height", y.bandwidth())
-        .attr("width", (d: any) => x(d.percent))
-        .attr("fill", (d: any) => color(d.BodyPart));
-
+    // Big bars
     let totalHeights = 0
     this.svg.append("g")
       .selectAll()
@@ -124,11 +110,56 @@ export class Viz2Component implements OnInit {
         d3.selectAll(".legend-element." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
         d3.selectAll(".small-bars." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
         d3.select(target).transition().duration(200).style('opacity', opacityBigBars);
+
+        const pos = target.getBoundingClientRect();
+        this.svg.append("text")
+          .style("fill", color(d.BodyPart))
+          .style("font-size", percentFontSize)
+          .attr("class", "percent")
+          .attr("x", pos.width + this.marginLeft + 10)
+          .attr("y", pos.y - this.margin * 2)
+          .transition().duration(200)
+          .text(percentFormat(d.percent));
       })
       .on("mouseleave", (event: Event, d: any) => {
         d3.selectAll(".big-bars").transition().duration(100).style("opacity", opacityBigBars);
         d3.selectAll(".small-bars").transition().duration(100).style("opacity", 1);
         d3.selectAll(".legend-element").transition().duration(100).style("opacity", 1);
+        d3.selectAll(".percent").remove();
+      });
+
+    // Small bars
+    this.svg.append("g")
+      .selectAll()
+      .data(d3.group(data, d => d.BodyPart))
+      .join("g")
+        .attr("transform", ([bodyPart,]: any[]) => {
+          return `translate(${this.marginLeft},${bodyParts.indexOf(bodyPart) * paddingBodyParts})`;
+        })
+      .selectAll()
+      .data(([, d]: any) => d)
+      .join("rect")
+        .attr("class", (d: any) => "small-bars " + d.BodyPart)
+        .attr("x", x(0))
+        .attr("y", (d: any) => y(d.BodySeat))
+        .attr("height", y.bandwidth())
+        .attr("width", (d: any) => x(d.percent))
+        .attr("fill", (d: any) => color(d.BodyPart))
+      .on("mouseover", (event: Event, d: any) => {
+        const target = event.currentTarget as SVGElement;
+        console.log(d)
+        const pos = target.getBoundingClientRect();
+        this.svg.append("text")
+          .style("fill", color(d.BodyPart))
+          .style("font-size", percentFontSize)
+          .attr("class", "percent-small")
+          .attr("x", pos.width + this.marginLeft + 10)
+          .attr("y", pos.y - this.margin * 2 - 10)
+          .transition().duration(200)
+          .text(percentFormat(d.percent));
+      })
+      .on("mouseleave", (event: Event, d: any) => {
+        d3.selectAll(".percent-small").remove();
       });
 
     // x-axis
@@ -136,7 +167,7 @@ export class Viz2Component implements OnInit {
       .attr("transform", `translate(${this.marginLeft},${this.height})`)
       .call(d3.axisBottom(x)
               .tickValues([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45])
-              .tickFormat(d3.format(".0%")));
+              .tickFormat(percentFormat));
     
     this.svg.append("text")
       .attr("class", "x label")

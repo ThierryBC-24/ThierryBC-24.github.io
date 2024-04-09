@@ -19,8 +19,9 @@ export class Viz2Component implements OnInit {
   private svg: any;
   private margin = 50;
   private marginLeft = 200;
-  private width = 1200;
-  private height = 700 - (this.margin * 2);
+  private legendWidth = 300;
+  private width = 1400 - this.margin * 2;
+  private height = 700 - this.margin * 2;
   private data = [
     {"BodySeat":"REGION CRANIENNE, Y COMPRIS LE CRANE","NLesions":4203, "BodyPart":"Tête"},
     {"BodySeat":"OREILLE(S)","NLesions":11467, "BodyPart":"Tête"},
@@ -74,8 +75,8 @@ export class Viz2Component implements OnInit {
   private createSvg(): void {
     this.svg = d3.select("figure#bar")
     .append("svg")
-    .attr("width", this.width + (this.margin * 2))
-    .attr("height", this.height + (this.margin * 2))
+    .attr("width", this.width + this.margin * 2)
+    .attr("height", this.height + this.margin * 2)
     .append("g")
     .attr("transform", "translate(" + this.margin + "," + this.margin + ")");
   }
@@ -109,7 +110,7 @@ export class Viz2Component implements OnInit {
 
     const x = d3.scaleLinear()
       .domain([0, scaleBreak, scaleBreak, 0.6])
-      .range([0, (this.width + this.margin) - 400, (this.width + this.margin) - 400, this.width + this.margin]);
+      .range([0, this.width - 400 - this.legendWidth, this.width - 400 - this.legendWidth, this.width - this.legendWidth]);
 
     const y = d3.scaleBand()
       .domain(data.map(d => d.BodySeat))

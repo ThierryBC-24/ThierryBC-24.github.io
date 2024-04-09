@@ -301,7 +301,7 @@ export class BubbleBarChartComponent implements OnInit {
     .attr('transform', "translate(" + (this.width + this.margin) + "," + 300 + ")");
 
     legend.selectAll(".bubble-legend")
-    .data([100, 50000, 100000, 200000])
+    .data([500, 50000, 100000, 200000])
     .enter()
     .append("circle")
     .attr("class", "bubble-legend")
@@ -314,14 +314,14 @@ export class BubbleBarChartComponent implements OnInit {
     .on("mouseleave", (event: any) => this.hideTooltip(event));
 
     legend.selectAll(".size")
-    .data([100, 50000, 100000, 200000])
+    .data([500, 50000, 100000, 200000])
     .enter()
     .append("text")
     .attr("class", "size")
     // .attr("x", this.width + this.margin + 100)
     .attr("y", (d: any) => this.height - 300 - (this.radiusScale as d3.ScaleLinear<number, number>)(d) * 2)
     .attr('transform', "translate(" + 100 + "," + 0 + ")")
-    .text((d: any) => d)
+    .text((d: any) => d === 500 ? "<" + d : d)
     .style("font-family", "sans-serif")
     .style("font-size", "0.8rem")
     .style("fill", "black");

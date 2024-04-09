@@ -20,7 +20,6 @@ export class Viz2Component implements OnInit {
   private margin = 50;
   private marginLeft = 200;
   private width = 1200;
-  private barHeight = 20;
   private height = 700 - (this.margin * 2);
   private data = [
     {"BodySeat":"REGION CRANIENNE, Y COMPRIS LE CRANE","NLesions":4203, "BodyPart":"Tête"},
@@ -68,8 +67,8 @@ export class Viz2Component implements OnInit {
 
   ngOnInit(): void {
     this.createSvg();
-    const data: any[] = this.formatData(this.data);
-    this.drawGroupedBars(data);
+    const data: any = this.formatData(this.data);
+    this.drawGroupedBars(data.bodySeats, data.bodyParts);
   }
 
   private createSvg(): void {
@@ -81,87 +80,109 @@ export class Viz2Component implements OnInit {
     .attr("transform", "translate(" + this.margin + "," + this.margin + ")");
   }
 
-  private formatData(data: any[]): any[] {
+  private formatData(data: any[]): any {
     const lesions = data.map(item => item.NLesions);
     const sum = lesions.reduce((acc, curr) => acc + curr, 0);
     data.forEach(item => {
       item.percent = item.NLesions/sum;
     });
-    // TODO: ajouter les percent par body seats
-    // const grouped = data.reduce((groups, item) => {
-    //   (groups[item.BodyPart] ||= []).push(item);
-    //   return groups;
-    // }, {});
-    // const groupedBodyPart: any[] = [];
-    // grouped.forEach((group: any[]) => {
-    //   const lesionsSeat = group.map(item => item.NLesions);
-    //   const sumSeat = lesionsSeat.reduce((acc, curr) => acc + curr, 0);
-    //   groupedBodyPart.push({ bodyPart: sumSeat/sum });
-    // });
-    // console.log(groupedBodyPart);
-    console.log(data.map(d => d.percent));
-    return data;
+
+    const grouped = data.reduce((groups, item) => {
+      (groups[item.BodyPart] ||= []).push(item);
+      return groups;
+    }, {});
+    const bodyParts: any[] = [];
+    for (const g in grouped) {
+      const lesionsSeat = grouped[g].map((item: any) => item.NLesions);
+      const sumSeat = lesionsSeat.reduce((acc: any, curr: any) => acc + curr, 0);
+      bodyParts.push({ BodyPart: g, percent: sumSeat/sum, height: grouped[g].length });
+    };
+    return { bodySeats: data, bodyParts: bodyParts };
   }
 
-  private drawGroupedBars(data: any[]): void {
+  private drawGroupedBars(data: any[], bodyPartsData: any): void {
     const bodyParts = new Set(data.map(d => d.BodyPart));
 
     let cummul = 0;
+    // TODO: simplifier occurences juste des index
     const occurences = (data.map(d => d.BodyPart)).reduce((acc, curr) => {
       return acc[curr] ? acc[curr] : acc[curr] = cummul++, acc
     }, {});
 
     const scaleBreak = 0.15;
+    const paddingBars = 0.3;
+    const paddingBodyParts = 20;
 
-    // const x = d3.scaleLinear()
-    //   .domain([0, Math.max(...data.map(item => item.NLesions)) + 10000])
-    //   .range([0, this.width - this.margin]);
     const x = d3.scaleLinear()
       .domain([0, scaleBreak, scaleBreak, 0.6])
-      .range([0, (this.width - this.margin) - 400, (this.width - this.margin) - 400, this.width - this.margin]);
-    
+      .range([0, (this.width + this.margin) - 400, (this.width + this.margin) - 400, this.width + this.margin]);
+
     const y = d3.scaleBand()
       .domain(data.map(d => d.BodySeat))
-      .rangeRound([this.margin, this.height - this.margin])
-      .padding(0.3);
+      .rangeRound([this.margin, this.height - (bodyParts.size - 1) * paddingBodyParts])
+      // .rangeRound([this.margin, this.height - this.margin - (bodyParts.size - 3) * paddingBodyParts])
+      .padding(paddingBars);
+
+    const paddingBarsLength = ((y.range()[1] - y.range()[0]) * paddingBars)/(data.map(d => d.BodySeat)).length;
+
+    const z = d3.scaleBand()
+      .domain(bodyPartsData.map((d: any) => d.BodyPart))
+      .rangeRound([this.margin, this.height - (bodyParts.size - 1) * paddingBodyParts])
+    // console.log(y(data[1].BodySeat));
+    // console.log(z(bodyPartsData[1].BodyPart));
 
     const color = d3.scaleOrdinal()
       .domain(bodyParts)
       .range(d3.schemeSpectral[bodyParts.size])
       .unknown("#ccc");
 
-    // console.log(data.map(item => item.NLesions));
-
     this.svg.append("g")
       .selectAll()
       .data(d3.group(data, d => d.BodyPart))
       .join("g")
-        .attr("transform", ([bodyPart]: string[]) => {
-          return `translate(${this.marginLeft},${(occurences[bodyPart] - 1) * y.bandwidth()})`;
+        .attr("transform", ([bodyPart,d]: any[]) => {
+          return `translate(${this.marginLeft},${(occurences[bodyPart] - 1) * paddingBodyParts})`;
+        })
+        // .attr("transform", ([bodyPart,d]: any[]) => {
+        //   return `translate(${this.marginLeft},${(occurences[bodyPart] - 1) * paddingBodyParts})`;
+        // })
+      .selectAll()
+      .data(([, d]: any) => d)
+      .join("rect")
+        .attr("x", x(0))
+        .attr("y", (d: any) => y(d.BodySeat))
+        .attr("height", y.bandwidth())
+        .attr("width", (d: any) => x(d.percent))
+        .attr("fill", (d: any) => color(d.BodyPart));
+
+    let previousHeight = 0;
+    let totalHeights = 0
+    this.svg.append("g")
+      .selectAll()
+      .data(d3.group(bodyPartsData, (d: any) => d.BodyPart))
+      .join("g")
+        .attr("transform", ([bodyPart, d]: any[]) => {
+          let a = y(data[totalHeights].BodySeat);
+          if (!a) a = 0;
+          const translate = `translate(${this.marginLeft},${a + (occurences[bodyPart] - 1) * paddingBodyParts - paddingBodyParts/4})`;
+          totalHeights += d[0].height;
+          return translate;
         })
       .selectAll()
       .data(([, d]: any) => d)
       .join("rect")
+        .style('opacity', 0.5)
         .attr("x", (d: any) => x(0))
-        .attr("y", (d: any) => y(d.BodySeat))
-        .attr("height", y.bandwidth())
-        // .attr("height", this.barHeight)
-        .attr("width", (d: any) => {
-          // console.log(x(d.NLesions));
-          return x(d.percent);
-        })
+        .attr("y", (d: any) => 0)
+        .attr("height", (d: any) => (y.bandwidth() + paddingBarsLength) * d.height + paddingBodyParts/2)
+        .attr("width", (d: any) => x(d.percent))
         .attr("fill", (d: any) => color(d.BodyPart));
 
-    const tickValuesArray = d3.range(15).map((d) => {
-      return x.invert(this.width * (d / 14))
-    });
     // x-axis
     this.svg.append("g")
       .attr("transform", `translate(${this.marginLeft},${this.height})`)
       .call(d3.axisBottom(x)
-              // .tickSizeOuter(0)
               .tickValues([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45]));
-              // .tickValues([2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 45000, 70000]));
     
     this.svg.append("text")
       .attr("class", "x label")
@@ -181,7 +202,7 @@ export class Viz2Component implements OnInit {
         .attr("transform", (d: any) => {
           let a = y(d.BodySeat);
           if (!a) a = 0;
-          return `translate(0,${(occurences[d.BodyPart] - 1) * y.bandwidth() + a})`;
+          return `translate(0,${(occurences[d.BodyPart] - 1) * paddingBodyParts + a})`;
         }
     );
 
@@ -213,7 +234,6 @@ export class Viz2Component implements OnInit {
 
     // Legend
     this.drawLegend(bodyParts, color);
-    
   }
   
   private drawLegend(bodyParts: Set<any>, color: d3.ScaleOrdinal<string, unknown, string>) {

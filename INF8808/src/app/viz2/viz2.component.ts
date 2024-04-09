@@ -117,18 +117,18 @@ export class Viz2Component implements OnInit {
         .attr("fill", (d: any) => color(d.BodyPart))
       .on("mouseover", (event: Event, d: any) => {
         const target = event.currentTarget as SVGElement;
-        d3.selectAll(".big-bars").style("opacity", 0.2);
-        d3.selectAll(".small-bars").style("opacity", 0.4);
-        d3.selectAll(".legend-element").style("opacity", 0.4);
+        d3.selectAll(".big-bars").transition().duration(200).style("opacity", 0.2);
+        d3.selectAll(".small-bars").transition().duration(200).style("opacity", 0.4);
+        d3.selectAll(".legend-element").transition().duration(200).style("opacity", 0.4);
     
-        d3.selectAll(".legend-element." + d.BodyPart.replace(' ', '.')).style("opacity", 1);
-        d3.selectAll(".small-bars." + d.BodyPart.replace(' ', '.')).style("opacity", 1);
-        d3.select(target).style('opacity', opacityBigBars);
+        d3.selectAll(".legend-element." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
+        d3.selectAll(".small-bars." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
+        d3.select(target).transition().duration(200).style('opacity', opacityBigBars);
       })
       .on("mouseleave", (event: Event, d: any) => {
-        d3.selectAll(".big-bars").style("opacity", opacityBigBars);
-        d3.selectAll(".small-bars").style("opacity", 1);
-        d3.selectAll(".legend-element").style("opacity", 1);
+        d3.selectAll(".big-bars").transition().duration(100).style("opacity", opacityBigBars);
+        d3.selectAll(".small-bars").transition().duration(100).style("opacity", 1);
+        d3.selectAll(".legend-element").transition().duration(100).style("opacity", 1);
       });
 
     // x-axis

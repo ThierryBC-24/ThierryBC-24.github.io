@@ -57,21 +57,7 @@ export class Viz2Component implements OnInit {
     const scaleBreak = 0.15;
     const paddingBars = 0.3;
     const paddingBodyParts = 20;
-
-    const mouseover = (d: any) => {
-      console.log(d.target);
-      // var subgroupName = d3.select().datum().key; // This was the tricky part
-      // d3.selectAll(".myRect").style("opacity", 0.2)
-      // d3.selectAll("."+subgroupName)
-      //   .style("opacity", 1)
-    }
-  
-    // When user do not hover anymore
-    const mouseleave = (d: any) => {
-      // console.log(d);
-      // d3.selectAll(".myRect")
-      //   .style("opacity",0.8)
-    }
+    const opacityBigBars = 0.5;
 
     const x = d3.scaleLinear()
       .domain([0, scaleBreak, scaleBreak, 0.5])
@@ -86,7 +72,8 @@ export class Viz2Component implements OnInit {
 
     const color = d3.scaleOrdinal()
       .domain(bodyParts)
-      .range(d3.schemeSpectral[bodyParts.length])
+      .range(d3.schemeSet2)
+      // .range(d3.schemeSpectral[bodyParts.length])
       .unknown("#ccc");
 
     this.svg.append("g")
@@ -99,7 +86,7 @@ export class Viz2Component implements OnInit {
       .selectAll()
       .data(([, d]: any) => d)
       .join("rect")
-        .attr("class", "small-bars")
+        .attr("class", (d: any) => "small-bars " + d.BodyPart)
         .attr("x", x(0))
         .attr("y", (d: any) => y(d.BodySeat))
         .attr("height", y.bandwidth())
@@ -121,15 +108,28 @@ export class Viz2Component implements OnInit {
       .selectAll()
       .data(([, d]: any) => d)
       .join("rect")
-        .style('opacity', 0.5)
+        .style('opacity', opacityBigBars)
         .attr("class", "big-bars")
         .attr("x", (d: any) => x(0))
         .attr("y", (d: any) => 0)
         .attr("height", (d: any) => (y.bandwidth() + paddingBarsLength) * d.height + paddingBodyParts/2)
         .attr("width", (d: any) => x(d.percent))
         .attr("fill", (d: any) => color(d.BodyPart))
-      .on("mouseover", mouseover)
-      .on("mouseleave", mouseleave);
+      .on("mouseover", (event: Event, d: any) => {
+        const target = event.currentTarget as SVGElement;
+        d3.selectAll(".big-bars").style("opacity", 0.2);
+        d3.selectAll(".small-bars").style("opacity", 0.4);
+        d3.selectAll(".legend-element").style("opacity", 0.4);
+    
+        d3.selectAll(".legend-element." + d.BodyPart.replace(' ', '.')).style("opacity", 1);
+        d3.selectAll(".small-bars." + d.BodyPart.replace(' ', '.')).style("opacity", 1);
+        d3.select(target).style('opacity', opacityBigBars);
+      })
+      .on("mouseleave", (event: Event, d: any) => {
+        d3.selectAll(".big-bars").style("opacity", opacityBigBars);
+        d3.selectAll(".small-bars").style("opacity", 1);
+        d3.selectAll(".legend-element").style("opacity", 1);
+      });
 
     // x-axis
     this.svg.append("g")
@@ -197,6 +197,7 @@ export class Viz2Component implements OnInit {
       .data(bodyParts)
       .enter()
       .append("rect")
+        .attr("class", (d: any) => "legend-element " + d)
         .attr("x", this.width - this.margin - 100)
         .attr("y", (d: any, i: number) => this.margin + i * (size + spacingLegend))
         .attr("width", size)
@@ -207,11 +208,11 @@ export class Viz2Component implements OnInit {
       .data(bodyParts)
       .enter()
       .append("text")
+        .attr("class", (d: any) => "legend-element " + d)
         .attr("x", this.width - this.margin + size * 1.2 - 100)
         .attr("y", (d: any, i: number) => this.margin + i * (size + spacingLegend) + (size/1.5))
         .text((d: any) => d)
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle");
   }
-
 }

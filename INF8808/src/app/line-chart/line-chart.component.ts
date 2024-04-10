@@ -305,13 +305,14 @@ export class LineChartComponent implements OnInit {
       filter
         .append('feGaussianBlur')
         .attr('in', 'SourceAlpha')
-        .attr('stdDeviation', 4)
+        .attr('stdDeviation', 0.5)
         .attr('result', 'blur');
+
       filter
         .append('feOffset')
         .attr('in', 'blur')
-        .attr('dx', 2)
-        .attr('dy', 2)
+        .attr('dx', 0)
+        .attr('dy', 0)
         .attr('result', 'offsetBlur');
 
       var feMerge = filter.append('feMerge');
@@ -332,7 +333,7 @@ export class LineChartComponent implements OnInit {
         .attr('y', circle.cy.baseVal.value - 15)
         .text(`${data.ANNEE} - ${data[risk].toFixed(2)}%`)
         .attr('class', 'tooltip')
-        .style('font-size', '18px')
+        .style('font-size', '14px')
         .style('opacity', '1');
 
       let bbox = (group.node() as SVGTextElement).getBBox();

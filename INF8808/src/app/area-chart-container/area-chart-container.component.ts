@@ -11,7 +11,7 @@ import { viz1_data } from 'data/Viz 1/lesions_secteur_annee.constants';
 enum Colors {
   INCREASING = '#D92C2C',
   STABLE = '#E68004',
-  DECREASING = '#14B8A6',
+  DECREASING = '#674FFA',
 }
 
 @Component({

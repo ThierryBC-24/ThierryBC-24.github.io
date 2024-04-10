@@ -60,7 +60,8 @@ export class WaffleChartComponent implements AfterViewInit {
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
       .attr('font-size', `${this.width * 0.1}px`)
-      .attr('fill', '#00408B')
+      .attr('fill', '#674FFA')
+      .attr('font-weight', 'bold')
       .text(ageText);
   }
 
@@ -71,8 +72,9 @@ export class WaffleChartComponent implements AfterViewInit {
       .attr('y', (this.height - this.marginTop) / 2)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('font-size', `${this.width * 0.13}px`)
-      .attr('fill', '#00408B')
+      .attr('font-size', `${this.width * 0.2}px`)
+      .attr('fill', '#674FFA')
+      .attr('font-weight', 'bold')
       .text(`${Math.round((100 * data.NB_LESION) / this.totalValue)}%`);
   }
 

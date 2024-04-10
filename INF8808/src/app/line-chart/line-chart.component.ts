@@ -31,7 +31,7 @@ export class LineChartComponent implements OnInit {
   private colorScale = d3
     .scaleOrdinal()
     .domain(RISK_NAMES)
-    .range(d3.schemeCategory10);
+    .range(['#674FFA', '#A999CD', '#EF26C9', '#FFC44D', '#009E75']);
 
   private xScale: any;
   private yScale: any;
@@ -277,7 +277,7 @@ export class LineChartComponent implements OnInit {
       )
       .attr('height', this.height - this.margin.top - this.margin.bottom)
       .attr('y', this.margin.top)
-      .attr('fill', 'silver')
+      .attr('fill', '#E9E6FE')
       .style('opacity', 0.5);
   }
 
@@ -305,13 +305,14 @@ export class LineChartComponent implements OnInit {
       filter
         .append('feGaussianBlur')
         .attr('in', 'SourceAlpha')
-        .attr('stdDeviation', 4)
+        .attr('stdDeviation', 0.5)
         .attr('result', 'blur');
+
       filter
         .append('feOffset')
         .attr('in', 'blur')
-        .attr('dx', 2)
-        .attr('dy', 2)
+        .attr('dx', 0)
+        .attr('dy', 0)
         .attr('result', 'offsetBlur');
 
       var feMerge = filter.append('feMerge');
@@ -332,7 +333,7 @@ export class LineChartComponent implements OnInit {
         .attr('y', circle.cy.baseVal.value - 15)
         .text(`${data.ANNEE} - ${data[risk].toFixed(2)}%`)
         .attr('class', 'tooltip')
-        .style('font-size', '18px')
+        .style('font-size', '14px')
         .style('opacity', '1');
 
       let bbox = (group.node() as SVGTextElement).getBBox();
@@ -350,7 +351,8 @@ export class LineChartComponent implements OnInit {
 
       bbox = (group.node() as SVGTextElement).getBBox();
 
-      group.insert('rect', 'text')
+      group
+        .insert('rect', 'text')
         .attr('x', bbox.x - 5)
         .attr('y', bbox.y - 2)
         .attr('width', bbox.width + 10)

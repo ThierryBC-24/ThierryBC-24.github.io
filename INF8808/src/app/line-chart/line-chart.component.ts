@@ -277,7 +277,7 @@ export class LineChartComponent implements OnInit {
       )
       .attr('height', this.height - this.margin.top - this.margin.bottom)
       .attr('y', this.margin.top)
-      .attr('fill', 'silver')
+      .attr('fill', '#E9E6FE')
       .style('opacity', 0.5);
   }
 

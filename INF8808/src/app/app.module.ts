@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { Viz2Component } from './viz2/viz2.component';
 import { BubbleBarChartComponent } from './bubble-bar-chart/bubble-bar-chart.component';
 import { WaffleChartContainerComponent } from './waffle-chart-container/waffle-chart-container.component';
 import { WaffleChartComponent } from './waffle-chart/waffle-chart.component';
@@ -14,6 +15,7 @@ import { ConnectedPlotComponent } from './connected-plot/connected-plot.componen
 @NgModule({
   declarations: [
     AppComponent,
+    Viz2Component,
     BubbleBarChartComponent,
     WaffleChartContainerComponent,
     WaffleChartComponent,

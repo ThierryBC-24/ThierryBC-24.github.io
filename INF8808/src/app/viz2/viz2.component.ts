@@ -38,7 +38,7 @@ export class Viz2Component implements OnInit {
     const lesions = data.map((item) => item.NLesions);
     const sum = lesions.reduce((acc, curr) => acc + curr, 0);
     data.forEach((item) => (item.percent = item.NLesions / sum));
-
+    
     const grouped = data.reduce((groups, item) => {
       (groups[item.BodyPart] ||= []).push(item);
       return groups;
@@ -56,7 +56,13 @@ export class Viz2Component implements OnInit {
         height: grouped[g].length,
       });
     }
-    return { bodySeats: data, bodyParts: bodyParts };
+
+    bodyParts.sort((a: any, b: any) => b.percent - a.percent);
+    const orderedData = bodyParts.map((b: any) =>
+      data.filter((d: any) => d.BodyPart === b.BodyPart).sort((a: any, b: any) => b.percent - a.percent)
+    );
+
+    return { bodySeats: orderedData.flat(), bodyParts: bodyParts };
   }
 
   private drawGroupedBars(data: any[], bodyPartsData: any): void {

@@ -57,8 +57,7 @@ export class Viz2Component implements OnInit {
     const scaleBreak = 0.15;
     const paddingBars = 0.3;
     const paddingBodyParts = 20;
-    const opacityBigBars = 0.5;
-    const percentFontSize = "12px";
+    const opacityBigBars = 0.3;
     const percentFormat = d3.format(".0%");
 
     const x = d3.scaleLinear()
@@ -71,11 +70,11 @@ export class Viz2Component implements OnInit {
       .padding(paddingBars);
 
     const paddingBarsLength = ((y.range()[1] - y.range()[0]) * paddingBars)/(data.map(d => d.BodySeat)).length;
+    const percentFontSize = String(y.bandwidth() + paddingBarsLength) + "px";
 
     const color = d3.scaleOrdinal()
       .domain(bodyParts)
       .range(d3.schemeSet2)
-      // .range(d3.schemeSpectral[bodyParts.length])
       .unknown("#ccc");
 
     // Big bars
@@ -95,7 +94,7 @@ export class Viz2Component implements OnInit {
       .data(([, d]: any) => d)
       .join("rect")
         .style('opacity', opacityBigBars)
-        .attr("class", "big-bars")
+        .attr("class", (d: any) => "big-bars " + d.BodyPart)
         .attr("x", (d: any) => x(0))
         .attr("y", (d: any) => 0)
         .attr("height", (d: any) => (y.bandwidth() + paddingBarsLength) * d.height + paddingBodyParts/2)
@@ -109,24 +108,66 @@ export class Viz2Component implements OnInit {
     
         d3.selectAll(".legend-element." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
         d3.selectAll(".small-bars." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
+        d3.selectAll(".percent-big." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
         d3.select(target).transition().duration(200).style('opacity', opacityBigBars);
-
-        const pos = target.getBoundingClientRect();
-        this.svg.append("text")
-          .style("fill", color(d.BodyPart))
-          .style("font-size", percentFontSize)
-          .attr("class", "percent")
-          .attr("x", pos.width + this.marginLeft + 10)
-          .attr("y", pos.y - this.margin * 2)
-          .transition().duration(200)
-          .text(percentFormat(d.percent));
+        
+        // const pos = target.getBoundingClientRect();
+        // this.svg.append("text")
+        //   .style("fill", color(d.BodyPart))
+        //   .style("font-size", percentFontSize)
+        //   .attr("class", "percent")
+        //   .attr("x", pos.width + this.marginLeft + 10)
+        //   .attr("y", pos.y - this.margin * 2)
+        //   .transition().duration(200)
+        //   .text(percentFormat(d.percent));
       })
       .on("mouseleave", (event: Event, d: any) => {
         d3.selectAll(".big-bars").transition().duration(100).style("opacity", opacityBigBars);
         d3.selectAll(".small-bars").transition().duration(100).style("opacity", 1);
         d3.selectAll(".legend-element").transition().duration(100).style("opacity", 1);
-        d3.selectAll(".percent").remove();
+        d3.selectAll(".percent-big").transition().duration(100).style("opacity", 0);
       });
+
+    // Big percentages
+    totalHeights = 0;
+    this.svg.selectAll()
+      .data(bodyPartsData)
+      .enter()
+      .append("text")
+      .style("fill", (d: any) => color(d.BodyPart))
+      .style("font-size", percentFontSize)
+      .style("opacity", 0)
+      .attr("class", (d: any) => "percent-big " + d.BodyPart)
+      .attr("x", (d: any) => {
+        return x(0) + x(d.percent) + this.marginLeft + 2;
+      })
+      .attr("y", (d: any) => {
+        let a = y(data[totalHeights].BodySeat);
+        if (!a) a = 0;
+        const value = a + bodyParts.indexOf(d.BodyPart) * paddingBodyParts - paddingBodyParts/4 + 7;
+        totalHeights += d.height;
+        return value;
+      })
+      .text((d: any) => percentFormat(d.percent));
+
+    // Small percentages
+    this.svg.selectAll()
+      .data(data)
+      .enter()
+      .append("text")
+      .style("fill", (d: any) => color(d.BodyPart))
+      .style("font-size", percentFontSize)
+      .style("opacity", 0)
+      .attr("class", (d: any) => "percent-small " + d.BodyPart)
+      .attr("x", (d: any) => {
+        return x(0) + x(d.percent) + this.marginLeft + 2;
+      })
+      .attr("y", (d: any) => {
+        let a = y(d.BodySeat);
+        if (!a) a = 0;
+        return bodyParts.indexOf(d.BodyPart) * paddingBodyParts + a + 7;
+      })
+      .text((d: any) => percentFormat(d.percent));
 
     // Small bars
     this.svg.append("g")
@@ -146,20 +187,19 @@ export class Viz2Component implements OnInit {
         .attr("width", (d: any) => x(d.percent))
         .attr("fill", (d: any) => color(d.BodyPart))
       .on("mouseover", (event: Event, d: any) => {
-        const target = event.currentTarget as SVGElement;
-        console.log(d)
-        const pos = target.getBoundingClientRect();
-        this.svg.append("text")
-          .style("fill", color(d.BodyPart))
-          .style("font-size", percentFontSize)
-          .attr("class", "percent-small")
-          .attr("x", pos.width + this.marginLeft + 10)
-          .attr("y", pos.y - this.margin * 2 - 10)
-          .transition().duration(200)
-          .text(percentFormat(d.percent));
+        // const target = event.currentTarget as SVGElement;
+        // const pos = target.getBoundingClientRect();
+        // this.svg.append("text")
+        //   .style("fill", color(d.BodyPart))
+        //   .style("font-size", percentFontSize)
+        //   .attr("class", "percent-small")
+        //   .attr("x", pos.width + this.marginLeft + 10)
+        //   .attr("y", pos.y - this.margin * 2 - 10)
+        //   .transition().duration(200)
+        //   .text(percentFormat(d.percent));
       })
       .on("mouseleave", (event: Event, d: any) => {
-        d3.selectAll(".percent-small").remove();
+        // d3.selectAll(".percent-small").remove();
       });
 
     // x-axis
@@ -224,7 +264,7 @@ export class Viz2Component implements OnInit {
   private drawLegend(bodyParts: Array<any>, color: d3.ScaleOrdinal<string, unknown, string>) {
     const size = 15;
     const spacingLegend = 15;
-    this.svg.selectAll("mydots")
+    this.svg.selectAll()
       .data(bodyParts)
       .enter()
       .append("rect")
@@ -235,7 +275,7 @@ export class Viz2Component implements OnInit {
         .attr("height", size)
         .style("fill", (d: any) => color(d));
   
-    this.svg.selectAll("mylabels")
+    this.svg.selectAll()
       .data(bodyParts)
       .enter()
       .append("text")

@@ -53,7 +53,8 @@ export class Viz2Component implements OnInit {
 
   private drawGroupedBars(data: any[], bodyPartsData: any): void {
     const bodyParts = Array.from(new Set(data.map(d => d.BodyPart)));
-
+    const bodySeats = Array.from(data.map(d => d.BodySeat))
+    
     const scaleBreak = 0.15;
     const paddingBars = 0.3;
     const paddingBodyParts = 20;
@@ -110,16 +111,6 @@ export class Viz2Component implements OnInit {
         d3.selectAll(".small-bars." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
         d3.selectAll(".percent-big." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
         d3.select(target).transition().duration(200).style('opacity', opacityBigBars);
-        
-        // const pos = target.getBoundingClientRect();
-        // this.svg.append("text")
-        //   .style("fill", color(d.BodyPart))
-        //   .style("font-size", percentFontSize)
-        //   .attr("class", "percent")
-        //   .attr("x", pos.width + this.marginLeft + 10)
-        //   .attr("y", pos.y - this.margin * 2)
-        //   .transition().duration(200)
-        //   .text(percentFormat(d.percent));
       })
       .on("mouseleave", (event: Event, d: any) => {
         d3.selectAll(".big-bars").transition().duration(100).style("opacity", opacityBigBars);
@@ -158,7 +149,7 @@ export class Viz2Component implements OnInit {
       .style("fill", (d: any) => color(d.BodyPart))
       .style("font-size", percentFontSize)
       .style("opacity", 0)
-      .attr("class", (d: any) => "percent-small " + d.BodyPart)
+      .attr("class", (d: any) => "percent-small " + d.BodyPart + " id-" + bodySeats.indexOf(d.BodySeat))
       .attr("x", (d: any) => {
         return x(0) + x(d.percent) + this.marginLeft + 2;
       })
@@ -187,19 +178,20 @@ export class Viz2Component implements OnInit {
         .attr("width", (d: any) => x(d.percent))
         .attr("fill", (d: any) => color(d.BodyPart))
       .on("mouseover", (event: Event, d: any) => {
-        // const target = event.currentTarget as SVGElement;
-        // const pos = target.getBoundingClientRect();
-        // this.svg.append("text")
-        //   .style("fill", color(d.BodyPart))
-        //   .style("font-size", percentFontSize)
-        //   .attr("class", "percent-small")
-        //   .attr("x", pos.width + this.marginLeft + 10)
-        //   .attr("y", pos.y - this.margin * 2 - 10)
-        //   .transition().duration(200)
-        //   .text(percentFormat(d.percent));
+        const target = event.currentTarget as SVGElement;
+        d3.selectAll(".big-bars").transition().duration(200).style("opacity", 0.2);
+        d3.selectAll(".small-bars").transition().duration(200).style("opacity", 0.4);
+        d3.selectAll(".legend-element").transition().duration(200).style("opacity", 0.4);
+    
+        d3.selectAll(".legend-element." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
+        d3.selectAll(".small-bars." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
+        d3.selectAll(".big-bars." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", opacityBigBars);
+        d3.selectAll(".percent-big." + d.BodyPart.replace(' ', '.')).transition().duration(200).style("opacity", 1);
+        if (bodyPartsData.find((item: any) => item.BodyPart === d.BodyPart).height !== 1)
+          d3.selectAll(".percent-small." + d.BodyPart.replace(' ', '.') + '.id-' + bodySeats.indexOf(d.BodySeat)).transition().duration(200).style("opacity", 1);
       })
       .on("mouseleave", (event: Event, d: any) => {
-        // d3.selectAll(".percent-small").remove();
+        d3.selectAll(".percent-small").transition().duration(100).style("opacity", 0);
       });
 
     // x-axis

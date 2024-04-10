@@ -31,7 +31,7 @@ export class LineChartComponent implements OnInit {
   private colorScale = d3
     .scaleOrdinal()
     .domain(RISK_NAMES)
-    .range(d3.schemeCategory10);
+    .range(['#674FFA', '#A999CD', '#EF26C9', '#FFC44D', '#009E75']);
 
   private xScale: any;
   private yScale: any;
@@ -350,7 +350,8 @@ export class LineChartComponent implements OnInit {
 
       bbox = (group.node() as SVGTextElement).getBBox();
 
-      group.insert('rect', 'text')
+      group
+        .insert('rect', 'text')
         .attr('x', bbox.x - 5)
         .attr('y', bbox.y - 2)
         .attr('width', bbox.width + 10)

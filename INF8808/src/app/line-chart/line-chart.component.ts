@@ -8,6 +8,7 @@ interface RisksData {
   'EXPOSITION AU BRUIT': number;
   'CHUTES DE MEME NIVEAU': number;
   'FRAPPE, COINCE OU ECRASE PAR UN OBJET': number;
+  'TOTAL': number;
 }
 
 const RISK_NAMES: (keyof RisksData)[] = [
@@ -97,6 +98,7 @@ export class LineChartComponent implements OnInit {
           'EXPOSITION AU BRUIT': +columns[3],
           'CHUTES DE MEME NIVEAU': +columns[4],
           'FRAPPE, COINCE OU ECRASE PAR UN OBJET': +columns[5],
+          'TOTAL': +columns[6],
         };
       })
       .filter((d) => d !== null) as RisksData[];
@@ -104,15 +106,10 @@ export class LineChartComponent implements OnInit {
 
   private prepareData(parsedData: RisksData[]): void {
     parsedData.forEach((d) => {
-      const totalRisks =
-        d['RISQUES ERGONOMIQUES'] +
-        d['RISQUES PSYCHOSOCIAUX'] +
-        d['EXPOSITION AU BRUIT'] +
-        d['CHUTES DE MEME NIVEAU'] +
-        d['FRAPPE, COINCE OU ECRASE PAR UN OBJET'];
+      const totalRisks = d['TOTAL']
 
       Object.keys(d).forEach((key) => {
-        if (key !== 'ANNEE') {
+        if (key !== 'ANNEE' && key !== 'TOTAL') {
           const riskKey = key as keyof RisksData;
           d[riskKey] = (d[riskKey] / totalRisks) * 100;
         }
@@ -136,12 +133,16 @@ export class LineChartComponent implements OnInit {
   }
 
   private createYScale(parsedData: RisksData[]): any {
-    const valuesWithoutYear: number[] = parsedData.flatMap((d) =>
-      Object.values(d).filter((value, index) => index !== 0)
+    const scaledValues: number[] = parsedData.flatMap((d) =>
+        Object.entries(d)
+      // Filter out the pairs where the key is either 'ANNEE' or 'TOTAL'
+      .filter(([key, value]) => key !== 'ANNEE' && key !== 'TOTAL')
+      // Map to get only the values
+      .map(([key, value]) => value)
     );
 
-    const minYValue = d3.min(valuesWithoutYear) || 0;
-    const maxYValue = d3.max(valuesWithoutYear) || 0;
+    const minYValue = d3.min(scaledValues) || 0;
+    const maxYValue = d3.max(scaledValues) || 0;
 
     this.yScale = d3
       .scaleLinear()

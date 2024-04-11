@@ -12,7 +12,7 @@ export class Viz2Component implements OnInit {
   private margin = 50;
   private marginLeft = 200;
   private legendWidth = 350;
-  private width = 1400 - this.margin * 2;
+  private width = 1200 - this.margin * 2;
   private height = 700 - this.margin * 2;
   private data = data_viz2;
 
@@ -38,7 +38,7 @@ export class Viz2Component implements OnInit {
     const lesions = data.map((item) => item.NLesions);
     const sum = lesions.reduce((acc, curr) => acc + curr, 0);
     data.forEach((item) => (item.percent = item.NLesions / sum));
-    
+
     const grouped = data.reduce((groups, item) => {
       (groups[item.BodyPart] ||= []).push(item);
       return groups;
@@ -59,7 +59,9 @@ export class Viz2Component implements OnInit {
 
     bodyParts.sort((a: any, b: any) => b.percent - a.percent);
     const orderedData = bodyParts.map((b: any) =>
-      data.filter((d: any) => d.BodyPart === b.BodyPart).sort((a: any, b: any) => b.percent - a.percent)
+      data
+        .filter((d: any) => d.BodyPart === b.BodyPart)
+        .sort((a: any, b: any) => b.percent - a.percent)
     );
 
     return { bodySeats: orderedData.flat(), bodyParts: bodyParts };

@@ -1,11 +1,106 @@
 <router-outlet></router-outlet>
+<div class="container">
+  <h1>Portrait des lésions professionnelles au Québec (2016-2022)</h1>
+  <h2>1. Selon le secteur d'activité</h2>
+  <div class="viz">
+    <app-area-chart-container></app-area-chart-container>
+  </div>
 
-<header>
-  <h1>Angular + D3</h1>
-</header>
-<app-area-chart-container></app-area-chart-container>
-<app-viz2></app-viz2>
-<app-line-chart></app-line-chart>
-<app-waffle-chart-container></app-waffle-chart-container>
-<app-connected-plot></app-connected-plot>
-<app-bubble-bar-chart></app-bubble-bar-chart>
+  <p>
+    Entre 2016 et 2022, le secteur d'activité ayant connu la plus forte
+    augmentation du nombre de lésions professionnelles est celui des soins de
+    santé et d'assistance sociale. Le service d'enseignement et le secteur de la
+    construction suivent de loin, avec environ 50% d'augmentation du nombre de
+    lésions professionnelles.
+  </p>
+  <h2>2. Selon le siège de la lésion</h2>
+  <div class="viz">
+    <app-viz2></app-viz2>
+  </div>
+  <p>
+    Le dos est le siège le plus fréquemment atteint chez les travailleurs.
+    Suivent, dans l'ordre : systèmes corporels, oreille(s), doigt(s),ongle(s) et
+    jambe(s).
+  </p>
+  <h2>3. Selon le groupe d'âge</h2>
+
+  <div class="viz">
+    <app-waffle-chart-container></app-waffle-chart-container>
+  </div>
+
+  <p>
+    Les lésions professionnelles se répartissent assez également entre les trois
+    groupes d'âge : 45 à 54, 35 à 44 et 25 à 34. Par ailleurs, les lésions
+    professionnelles sont moins fréquentes chez les travailleurs jeunes et les
+    travailleurs âgés.
+  </p>
+
+  <h2>4. Selon le sexe</h2>
+  <div class="viz">
+    <app-connected-plot></app-connected-plot>
+  </div>
+  <p>
+    L'écart entre les sexes est plus marqué dans le secteur des soins de santé
+    et de l'assistance sociale. Cette disparité peut s'expliquer par le fait que
+    les hommes et les femmes ne se répartissent pas également entre les
+    professions. D'ailleurs, parmi l'ensemble des secteurs d'activité, le nombre
+    de lésions professionnelles est souvent plus élevé chez les hommes que chez
+    les femmes.
+  </p>
+
+  <h2>5. Selon la nature de lésion, ou le genre d'accident</h2>
+  <div class="viz">
+    <app-bubble-bar-chart></app-bubble-bar-chart>
+  </div>
+
+  <p>
+    Environ un tiers des lésions sont des blessures traumatiques qui affectent
+    les muscles, les tendons. Viennent ensuite les natures plaie-contusion
+    superficielle, maladies du système nerveux ou des organes sensoriels,
+    troubles du système musculosquelettique et blessures traumatiques, os, nerfs
+    et moëlle épinière.
+  </p>
+  <p>
+    Les six genres d'accidents les plus fréquents chez les travailleurs sont les
+    suivants :
+  </p>
+  <ul>
+    <li>Effort excessif</li>
+    <li>
+      Exposition à des substances caustiques, nocives (toxiques) ou allergènes
+    </li>
+    <li>Réaction du corps</li>
+    <li>Chute de même niveau</li>
+    <li>Frappé par un objet</li>
+    <li>Exposition au bruit</li>
+  </ul>
+  <p>
+    Ces genres d'accidents englobent environ 67 % de l'ensemble des lésions.
+  </p>
+
+  <h2>7. Évolution des lésions liées aux risques prédominants</h2>
+  <div class="viz">
+    <app-line-chart></app-line-chart>
+  </div>
+
+  <p>
+    La CNESST priorise certains risques dans la "Planification pluriannuelle en
+    prévention-inspection 2020-2023" afin d'établir les priorités sur lesquelles
+    elle souhaite concentrer ses efforts. Les risques prédominants identifiés
+    par la CNESST sont les suivants :
+  </p>
+  <ul>
+    <li>Risques ergonomiques</li>
+    <li>Exposition au bruit</li>
+    <li>Chutes de même niveau</li>
+    <li>Risques psychosociaux liés au travail</li>
+    <li>Frappé, coincé ou écrasé par un objet ou de l'équipement</li>
+  </ul>
+  <p>
+    Pendant la période 2020-2023, une baisse du pourcentage de lésions a été
+    observée pour les incidents liés au 'frappé, coincé ou écrasé par un objet
+    ou de l'équipement' ainsi qu'aux 'chutes de même niveau'. En revanche, les
+    lésions liées à l'exposition au bruit ont légèrement augmenté par rapport
+    aux données enregistrées avant la mise en place des actions.
+  </p>
+</div>

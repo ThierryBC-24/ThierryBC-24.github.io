@@ -4,6 +4,7 @@ import { Lesion } from './data';
 
 const NATURE_Y_FORCE = 140000;
 const GENRE_Y_FORCE = 60000;
+const LABEL_CUTOFF = 100;
 
 @Component({
   selector: 'app-bubble-bar-chart',
@@ -21,7 +22,7 @@ export class BubbleBarChartComponent implements OnInit {
   private button: any;
   private tooltip: any;
   private margin = 150;
-  private width = 1500;
+  private width = 2250;
   private height = 450;
 
   private xAxis: d3.ScaleBand<string> | undefined;
@@ -104,7 +105,7 @@ export class BubbleBarChartComponent implements OnInit {
   private setLinearRadiusScale(): d3.ScaleLinear<number, number>{
     return d3.scaleLinear()
     .domain([0, 264227]) // Hard coded max value to max of both datasets
-    .range([3, 110]);
+    .range([5, 170]);
   }
 
   // Drawings
@@ -145,13 +146,46 @@ export class BubbleBarChartComponent implements OnInit {
     // Draw the X-axis on the DOM
     this.svg
       .append('g')
+      .attr('class', 'x axis')
       .attr('transform', 'translate(0,' + this.height + ')')
-      .call(d3.axisBottom(this.xAxis as d3.ScaleBand<string>))
-      .selectAll('text')
-      .attr('transform', 'translate(-10,0)rotate(-45)')
-      .style('text-anchor', 'end')
-      .attr('font-size', '0.8rem')
+      .call(d3.axisBottom(this.xAxis as d3.ScaleBand<string>).tickSize(0))
+      .selectAll('g')
+      .attr('font-size', '1.5rem')
       .attr('font-family', 'sans-serif');
+      
+    // Iterate over each element in the x axis
+    this.svg.selectAll('.x.axis g')._groups[0].forEach((element: any) => {
+      const text = d3.select(element);
+
+      // Split the text into an array of words
+      const words = text.text().split(/\s+/).reverse();
+
+      let word;
+      let line = [] as any[];
+      let lineHeight = 1;
+
+      // Create a new tspan element and set its attributes
+      let text2 = text.text(null).append('text');
+      let tspan = text2.append('tspan').attr("x", 0).attr('y', 3).attr('dy', 0 + 'em').attr('fill', 'black');
+
+      // Iterate over each word in the words array
+      while ((word = words.pop())) {
+        line.push(word);
+        tspan.text(line.join(' '));
+
+        // If the length of the tspan exceeds a certain threshold, create a new line
+        if (tspan.node()!.getComputedTextLength() > LABEL_CUTOFF) {
+          line.pop();
+          tspan.text(line.join(' '));
+          line = [word];
+          tspan = text2.append('tspan').attr("x", 0).attr('y', 3).attr('dy', lineHeight + 'em').attr('fill', 'black').text(word);
+          lineHeight += 1;
+        }
+      }
+    });
+    
+      // Remove the X-axis line
+    this.svg.selectAll(".x.axis .domain").remove();
   }
 
   private drawButton(): any {
@@ -407,7 +441,7 @@ export class BubbleBarChartComponent implements OnInit {
           300 -
           (this.radiusScale as d3.ScaleLinear<number, number>)(d) * 2
       )
-      .attr('transform', 'translate(' + 100 + ',' + 0 + ')')
+      .attr('transform', 'translate(' + 150 + ',' + 0 + ')')
       .text((d: any) => (d === 500 ? '<' + d : d))
       .style('font-family', 'sans-serif')
       .style('font-size', '0.8rem')

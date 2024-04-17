@@ -11,7 +11,6 @@ export class Viz2Component implements OnInit {
   private svg: any;
   private margin = 50;
   private marginLeft = 200;
-  private legendWidth = 350;
   private width = 1200 - this.margin * 2;
   private height = 700 - this.margin * 2;
   private data = data_viz2;
@@ -82,9 +81,9 @@ export class Viz2Component implements OnInit {
       .domain([0, scaleBreak, scaleBreak, 0.5])
       .range([
         0,
-        this.width - 400 - this.legendWidth,
-        this.width - 400 - this.legendWidth,
-        this.width - this.legendWidth,
+        this.width - 400 - this.margin * 3,
+        this.width - 400 - this.margin * 3,
+        this.width - this.margin * 3,
       ]);
 
     const y = d3
@@ -217,7 +216,10 @@ export class Viz2Component implements OnInit {
         totalHeights += d.height;
         return value;
       })
-      .text((d: any) => percentFormat(d.percent));
+      .text((d: any) => {
+        if (d.percent < 0.01) return '< 1%';
+        return percentFormat(d.percent);
+      });
 
     // Small percentages
     this.svg
@@ -243,7 +245,10 @@ export class Viz2Component implements OnInit {
         if (!a) a = 0;
         return bodyParts.indexOf(d.BodyPart) * paddingBodyParts + a + 7;
       })
-      .text((d: any) => percentFormat(d.percent));
+      .text((d: any) => {
+        if (d.percent < 0.01) return '< 1%';
+        return percentFormat(d.percent);
+      });
 
     // Small bars
     this.svg
@@ -401,7 +406,7 @@ export class Viz2Component implements OnInit {
       .attr('x', this.width - this.margin - 100)
       .attr(
         'y',
-        (d: any, i: number) => this.margin + i * (size + spacingLegend)
+        (d: any, i: number) => this.height - 300 + i * (size + spacingLegend)
       )
       .attr('width', size)
       .attr('height', size)
@@ -417,7 +422,7 @@ export class Viz2Component implements OnInit {
       .attr(
         'y',
         (d: any, i: number) =>
-          this.margin + i * (size + spacingLegend) + size / 1.5
+        this.height - 300 + i * (size + spacingLegend) + size / 1.5
       )
       .text((d: any) => d)
       .attr('text-anchor', 'left')

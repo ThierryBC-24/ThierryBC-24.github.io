@@ -4,7 +4,7 @@ import { Lesion } from './data';
 
 const NATURE_Y_FORCE = 140000;
 const GENRE_Y_FORCE = 60000;
-const LABEL_CUTOFF = 100;
+const LABEL_CUTOFF = 200;
 
 @Component({
   selector: 'app-bubble-bar-chart',
@@ -76,13 +76,14 @@ export class BubbleBarChartComponent implements OnInit {
   private createSvg(): void {
     this.svg = d3
       .select('figure#bubble-bar-chart')
+      .style('margin', 0)
       .append('svg')
       .attr(
         'viewBox',
-        `0 0 ${this.width + this.margin * 4} ${this.height + this.margin * 3}`
+        `0 0 ${this.width + this.margin * 2} ${this.height + this.margin * 3}`
       )
       .append('g')
-      .attr('transform', 'translate(' + this.margin + ',' + 50 + ')');
+      .attr('transform', 'translate(' + 0 + ',' + 50 + ')');
   }
 
   // Scales
@@ -92,7 +93,7 @@ export class BubbleBarChartComponent implements OnInit {
       .scaleBand()
       .range([0, this.width])
       .domain(Array.from(new Set(this.data.map((d) => d.categorie_genre))))
-      .padding(0.1);
+      .padding(0.5);
   }
 
   private setYScale(): d3.ScaleLinear<number, number> {
@@ -105,7 +106,7 @@ export class BubbleBarChartComponent implements OnInit {
   private setLinearRadiusScale(): d3.ScaleLinear<number, number>{
     return d3.scaleLinear()
     .domain([0, 264227]) // Hard coded max value to max of both datasets
-    .range([5, 170]);
+    .range([10, 150]);
   }
 
   // Drawings
@@ -166,7 +167,9 @@ export class BubbleBarChartComponent implements OnInit {
 
       // Create a new tspan element and set its attributes
       let text2 = text.text(null).append('text');
-      let tspan = text2.append('tspan').attr("x", 0).attr('y', 3).attr('dy', 0 + 'em').attr('fill', 'black');
+      let tspan = text2.append('tspan').attr("font-size", 1.5 + "em").attr("x", 0).attr('y', 3).attr('fill', 'black');
+
+      let firstRow = true;
 
       // Iterate over each word in the words array
       while ((word = words.pop())) {
@@ -174,13 +177,14 @@ export class BubbleBarChartComponent implements OnInit {
         tspan.text(line.join(' '));
 
         // If the length of the tspan exceeds a certain threshold, create a new line
-        if (tspan.node()!.getComputedTextLength() > LABEL_CUTOFF) {
+        if (tspan.node()!.getComputedTextLength() > LABEL_CUTOFF || firstRow) {
           line.pop();
           tspan.text(line.join(' '));
           line = [word];
-          tspan = text2.append('tspan').attr("x", 0).attr('y', 3).attr('dy', lineHeight + 'em').attr('fill', 'black').text(word);
+          tspan = text2.append('tspan').attr("font-size", 1.3 + "em").attr("x", 0).attr('y', 3).attr('dy', lineHeight + 'em').attr('fill', 'black').text(word);
           lineHeight += 1;
         }
+        firstRow = false;
       }
     });
     
@@ -191,7 +195,7 @@ export class BubbleBarChartComponent implements OnInit {
   private drawButton(): any {
     const toggleButton = this.svg.append('g')
     .attr('class', 'toggle-button')
-    .attr('transform', "translate(" + this.width + "," + 100 + ")")
+    .attr('transform', "translate(" + (this.width - 100) + "," + 100 + ")")
     .style("cursor", "pointer");
 
     const buttons = toggleButton.selectAll('.button')
@@ -199,31 +203,41 @@ export class BubbleBarChartComponent implements OnInit {
     .enter()
     .append('g')
     .attr('class', 'button')
-    .attr('transform', (d: any, i: any) => `translate(${i * this.margin}, 0)`)
+    .attr('transform', (d: any, i: any) => `translate(${i * (this.margin + 40)}, 0)`)
 
     buttons.append('rect')
     .attr('class', 'button')
-    .attr('width', this.margin)
-    .attr('height', 60)
+    .attr('width', this.margin + 30)
+    .attr('height', 80)
     .attr('fill', (d: any, i: any) => i === 0 ? '#aba1f6' : '#f4f3fd')
     .attr('x', (d: any, i: any) => i === 0 ? 2 : -2)
-    .attr('rx', 7)
+    .attr('rx', 0)
     .on('click', this.toggleSelection);
 
     buttons.append('text')
     .attr('pointer-events', 'none')
     .attr('class', 'button-text')
-    .text((d: any) => d)
+    .append('tspan')
+    .attr('class', 'button-text-first-row')
+    .attr('fill', (d: any, i: any) => i === 0 ? '#6350f1' : '#aba1f6')
+    .attr('x', 30) // Adjust x position to center text
+    .attr('y', 37) // Adjust y position to vertically center text
+    .text((d: any) => d.split(' ').slice(0, 1))
+    .attr('font-size', '35px')
+    .append('tspan')
+    .attr('class', 'button-text-second-row')
     .attr('fill', (d: any, i: any) => i === 0 ? '#6350f1' : '#aba1f6')
     .attr('x', 7) // Adjust x position to center text
-    .attr('y', 35); // Adjust y position to vertically center text
+    .attr('y', 70) // Adjust y position to vertically center text
+    .text((d: any) => d.split(' ').slice(1).join(' '))
+    .attr('font-size', '35px')
 
     toggleButton.append('line')
     .attr('class', 'separator-line')
-    .attr('x1', this.margin)
-    .attr('x2', this.margin)
+    .attr('x1', this.margin + 35)
+    .attr('x2', this.margin + 35)
     .attr('y1', 0)
-    .attr('y2', 60)
+    .attr('y2', 80)
     .attr('stroke', '#d5d5d5')
     .attr('stroke-width', 8);
 
@@ -242,22 +256,22 @@ export class BubbleBarChartComponent implements OnInit {
 
       const genre_button = this.button.selectAll('.button').filter((d: any) => d === 'Genres d\'accidents');
       genre_button.select('rect').attr('fill', '#aba1f6');
-      genre_button.select('text').attr('fill', '#6350f1');
+      genre_button.selectAll('tspan').attr('fill', '#6350f1');
 
       const nature_button = this.button.selectAll('.button').filter((d: any) => d === 'Natures de lésions');
       nature_button.select('rect').attr('fill', '#f4f3fd');
-      nature_button.select('text').attr('fill', '#aba1f6');
+      nature_button.selectAll('tspan').attr('fill', '#aba1f6');
     } else {
       this.currentOptionIndex = 1;
       this.currentForce = NATURE_Y_FORCE;
 
       const nature_button = this.button.selectAll('.button').filter((d: any) => d === 'Natures de lésions');
       nature_button.select('rect').attr('fill', '#aba1f6');
-      nature_button.select('text').attr('fill', '#6350f1');
+      nature_button.selectAll('tspan').attr('fill', '#6350f1');
 
       const genre_button = this.button.selectAll('.button').filter((d: any) => d === 'Genres d\'accidents');
       genre_button.select('rect').attr('fill', '#f4f3fd');
-      genre_button.select('text').attr('fill', '#aba1f6');
+      genre_button.selectAll('tspan').attr('fill', '#aba1f6');
     }
 
     d3.selectAll("figure#bubble-bar-chart svg g :not(.toggle-button, .button, .button-text, .separator-line, .button-text-first-row, .button-text-second-row").remove();
@@ -299,7 +313,7 @@ export class BubbleBarChartComponent implements OnInit {
     .attr('x', this.width / 2)
     .attr('y', 0)
     .attr('text-anchor', 'middle')
-    .style('font-size', '2rem')
+    .style('font-size', '3em')
     .style('font-family', 'sans-serif')
     .text(this.options[this.currentOptionIndex]);
   }
@@ -404,7 +418,7 @@ export class BubbleBarChartComponent implements OnInit {
       .attr('class', 'legend')
       .attr(
         'transform',
-        'translate(' + (this.width + this.margin) + ',' + 300 + ')'
+        'translate(' + (this.width + 50) + ',' + 300 + ')'
       );
 
     legend
@@ -433,7 +447,6 @@ export class BubbleBarChartComponent implements OnInit {
       .enter()
       .append('text')
       .attr('class', 'size')
-      // .attr("x", this.width + this.margin + 100)
       .attr(
         'y',
         (d: any) =>
@@ -441,10 +454,10 @@ export class BubbleBarChartComponent implements OnInit {
           300 -
           (this.radiusScale as d3.ScaleLinear<number, number>)(d) * 2
       )
-      .attr('transform', 'translate(' + 150 + ',' + 0 + ')')
+      .attr('transform', 'translate(' + 0 + ',' + 0 + ')')
       .text((d: any) => (d === 500 ? '<' + d : d))
       .style('font-family', 'sans-serif')
-      .style('font-size', '0.8rem')
+      .style('font-size', '1.5rem')
       .style('fill', 'black');
   }
 }

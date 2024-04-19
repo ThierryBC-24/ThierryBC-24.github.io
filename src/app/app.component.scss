@@ -10,3 +10,70 @@ h2 {
 .viz {
   margin: 3rem 0;
 }
+
+.header {
+  background-color: #223554;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.header-content {
+  width: 80%;
+  margin: auto;
+  color: #d9e7ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+}
+
+.logo {
+  height: 150px;
+  width: 150px;
+}
+
+h1 {
+  font-weight: 100;
+  font-size: 3rem;
+  margin: 0;
+}
+
+strong {
+  color: white;
+}
+
+.header-content p {
+  line-height: 175%;
+  color: white;
+  margin: 0;
+}
+
+a {
+  color: #223554;
+  text-decoration: none;
+  background-color: #d9e7ff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#context-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 14rem;
+}

@@ -246,7 +246,7 @@ export class ConnectedPlotComponent implements OnInit {
         return 'lollipop-line-' + this.trimString(`${d.name}`);
       })
       .attr('d', this.lollipopLinePath)
-      .attr('stroke', 'rgb(184, 181, 181)')
+      .attr('stroke', '#C2BED7')
       .attr('opacity', 0.5)
       .attr('stroke-width', '6px')
       .on('mouseover', (d: any) => {

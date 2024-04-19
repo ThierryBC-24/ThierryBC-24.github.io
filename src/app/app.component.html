@@ -1,6 +1,48 @@
 <router-outlet></router-outlet>
+<div class="header">
+  <div class="header-content">
+    <svg
+      class="logo"
+      width="219"
+      height="300"
+      viewBox="0 0 219 300"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g clip-path="url(#clip0_484_4)">
+        <path
+          d="M182.758 203.555C187.564 196.408 187.154 180.763 177.546 175.24C170.196 171.565 161.895 173.003 158.016 176.167C151.773 179.944 145.759 192.021 145.759 204.252L167.319 204.225L167.313 228.3L122.566 228.276C123.152 240.659 129.904 250.578 142.47 256.101C140.852 261.32 133.274 271.956 122.868 271.236C120.814 282.491 118.861 288.81 109.504 299.037C100.141 288.813 98.1887 282.491 96.1344 271.236C85.728 271.956 78.1505 261.32 76.5327 256.101C89.0981 250.578 95.8503 240.659 96.4364 228.276L51.686 228.3V204.225L73.2404 204.252C73.2404 192.021 67.2358 179.944 60.986 176.167C57.1075 173.006 48.8093 171.568 41.4621 175.24C31.8481 180.763 31.4355 196.411 36.2409 203.555C-9.15834 195.125 -4.65491 151.281 10.8111 135.364C23.3107 122.505 36.9377 120.496 47.4457 124.551C71.3265 133.112 87.3876 161.64 88.1681 204.252H100.656C100.656 165.515 93.9156 153.165 76.3533 104.512C67.5079 81.5196 72.8217 53.0934 88.6346 26.919C94.2983 17.5383 101.373 9.06969 109.504 0C117.629 9.06969 124.704 17.5383 130.368 26.919C146.181 53.0934 151.494 81.5196 142.655 104.512C125.084 153.165 118.344 165.512 118.344 204.252H130.831C131.612 161.64 147.679 133.112 171.554 124.551C182.062 120.499 195.698 122.505 208.191 135.364C223.654 151.281 228.158 195.125 182.758 203.555Z"
+          fill="white"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_484_4">
+          <rect width="219" height="299.037" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+    <div class="title">
+      <h1>Portrait des lésions professionnelles au <strong>Québec</strong></h1>
+    </div>
+    <a href="#contexte" id="context-button"
+      >Explorer les données
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M21.0004 5.00002L3.0004 5.00002C2.81816 5.00059 2.63953 5.05085 2.48373 5.1454C2.32793 5.23994 2.20086 5.37518 2.11621 5.53657C2.03155 5.69796 1.99252 5.87938 2.0033 6.0613C2.01408 6.24322 2.07428 6.41876 2.1774 6.56902L11.1774 19.569C11.5504 20.108 12.4484 20.108 12.8224 19.569L21.8224 6.56902C21.9266 6.41907 21.9877 6.24345 21.999 6.06122C22.0104 5.879 21.9716 5.69714 21.8869 5.53541C21.8022 5.37368 21.6747 5.23826 21.5184 5.14387C21.3622 5.04948 21.183 4.99973 21.0004 5.00002Z"
+          fill="#223554"
+        />
+      </svg>
+    </a>
+  </div>
+</div>
 <div class="container">
-  <h1>Portrait des lésions professionnelles au Québec (2016-2022)</h1>
+  <h2 id="contexte">Contexte</h2>
   <p>
     Pour en arriver à une porte d'entrée unique, le gouvernement du Québec a
     créé la Commission des normes, de l'équité, de la santé et de la sécurité du
@@ -16,11 +58,11 @@
     sur les données de lésions professionnelles indemnisées pour la période
     2016-2022.
   </p>
+
   <h2>1. Selon le secteur d'activité</h2>
   <div class="viz">
     <app-area-chart-container></app-area-chart-container>
   </div>
-
   <p>
     Entre 2016 et 2022, le secteur d'activité ayant connu la plus forte
     augmentation du nombre de lésions professionnelles est celui des soins de

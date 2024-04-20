@@ -98,9 +98,9 @@ export class WaffleChartComponent implements AfterViewInit {
             'fill',
             ((i * cols + j) * this.totalValue) / 100 < data.NB_LESION
               ? '#674FFA'
-              : '#E2E0F1'
+              : '#CED5E0'
           )
-          .attr('stroke', '#faf9ff')
+          .attr('stroke', '#e6efff')
           .attr('stroke-width', 3);
       }
     }

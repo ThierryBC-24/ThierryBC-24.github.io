@@ -29,10 +29,6 @@ export class BubbleBarChartComponent implements OnInit {
   private yAxis: d3.ScaleLinear<number, number> | undefined;
   private radiusScale: d3.ScaleLinear<number, number> | undefined;
 
-  private options = [
-    'QUELS GENRES D\'ACCIDENTS SONT LES PLUS FRÉQUENTS?',
-    'QUELLES NATURES DE LA LÉSION SURVIENNENT LE PLUS FRÉQUEMMENT?',
-  ];
   private currentOptionIndex = 0;
   private currentForce = GENRE_Y_FORCE;
 
@@ -63,13 +59,12 @@ export class BubbleBarChartComponent implements OnInit {
       this.createSvg();
       this.drawBubble();
       this.drawXAxis();
-      this.drawTitle();
       this.drawLegend();
       this.button = this.drawButton();
       this.tooltip = this.createTooltip();
 
-      const simulation = this.getSimulation()
-      this.simulate(simulation)
+      const simulation = this.getSimulation();
+      this.simulate(simulation);
     });
   }
 
@@ -103,10 +98,11 @@ export class BubbleBarChartComponent implements OnInit {
       .range([this.height, 0]);
   }
 
-  private setLinearRadiusScale(): d3.ScaleLinear<number, number>{
-    return d3.scaleLinear()
-    .domain([0, 264227]) // Hard coded max value to max of both datasets
-    .range([10, 150]);
+  private setLinearRadiusScale(): d3.ScaleLinear<number, number> {
+    return d3
+      .scaleLinear()
+      .domain([0, 264227]) // Hard coded max value to max of both datasets
+      .range([10, 150]);
   }
 
   // Drawings
@@ -153,7 +149,7 @@ export class BubbleBarChartComponent implements OnInit {
       .selectAll('g')
       .attr('font-size', '1.5rem')
       .attr('font-family', 'sans-serif');
-      
+
     // Iterate over each element in the x axis
     this.svg.selectAll('.x.axis g')._groups[0].forEach((element: any) => {
       const text = d3.select(element);
@@ -167,7 +163,12 @@ export class BubbleBarChartComponent implements OnInit {
 
       // Create a new tspan element and set its attributes
       let text2 = text.text(null).append('text');
-      let tspan = text2.append('tspan').attr("font-size", 1.5 + "em").attr("x", 0).attr('y', 3).attr('fill', 'black');
+      let tspan = text2
+        .append('tspan')
+        .attr('font-size', 1.5 + 'em')
+        .attr('x', 0)
+        .attr('y', 3)
+        .attr('fill', '#070032');
 
       let firstRow = true;
 
@@ -181,100 +182,126 @@ export class BubbleBarChartComponent implements OnInit {
           line.pop();
           tspan.text(line.join(' '));
           line = [word];
-          tspan = text2.append('tspan').attr("font-size", 1.3 + "em").attr("x", 0).attr('y', 3).attr('dy', lineHeight + 'em').attr('fill', 'black').text(word);
+          tspan = text2
+            .append('tspan')
+            .attr('font-size', 1.3 + 'em')
+            .attr('x', 0)
+            .attr('y', 3)
+            .attr('dy', lineHeight + 'em')
+            .attr('fill', '#070032')
+            .text(word);
           lineHeight += 1;
         }
         firstRow = false;
       }
     });
-    
-      // Remove the X-axis line
-    this.svg.selectAll(".x.axis .domain").remove();
+
+    // Remove the X-axis line
+    this.svg.selectAll('.x.axis .domain').remove();
   }
 
   private drawButton(): any {
-    const toggleButton = this.svg.append('g')
-    .attr('class', 'toggle-button')
-    .attr('transform', "translate(" + (this.width - 100) + "," + 100 + ")")
-    .style("cursor", "pointer");
+    const toggleButton = this.svg
+      .append('g')
+      .attr('class', 'toggle-button')
+      .attr('transform', 'translate(' + (this.width - 100) + ',' + 100 + ')')
+      .style('cursor', 'pointer');
 
-    const buttons = toggleButton.selectAll('.button')
-    .data(['Genres d\'accidents', 'Natures de lésions'])
-    .enter()
-    .append('g')
-    .attr('class', 'button')
-    .attr('transform', (d: any, i: any) => `translate(${i * (this.margin + 40)}, 0)`)
+    const buttons = toggleButton
+      .selectAll('.button')
+      .data(["Genres d'accidents", 'Natures de lésions'])
+      .enter()
+      .append('g')
+      .attr('class', 'button')
+      .attr(
+        'transform',
+        (d: any, i: any) => `translate(${i * (this.margin + 40)}, 0)`
+      );
 
-    buttons.append('rect')
-    .attr('class', 'button')
-    .attr('width', this.margin + 30)
-    .attr('height', 80)
-    .attr('fill', (d: any, i: any) => i === 0 ? '#aba1f6' : '#f4f3fd')
-    .attr('x', (d: any, i: any) => i === 0 ? 2 : -2)
-    .attr('rx', 0)
-    .on('click', this.toggleSelection);
+    buttons
+      .append('rect')
+      .attr('class', 'button')
+      .attr('width', this.margin + 30)
+      .attr('height', 80)
+      .attr('fill', (d: any, i: any) => (i === 0 ? '#aba1f6' : '#f4f3fd'))
+      .attr('x', (d: any, i: any) => (i === 0 ? 2 : -2))
+      .attr('rx', 0)
+      .on('click', this.toggleSelection);
 
-    buttons.append('text')
-    .attr('pointer-events', 'none')
-    .attr('class', 'button-text')
-    .append('tspan')
-    .attr('class', 'button-text-first-row')
-    .attr('fill', (d: any, i: any) => i === 0 ? '#6350f1' : '#aba1f6')
-    .attr('x', 30) // Adjust x position to center text
-    .attr('y', 37) // Adjust y position to vertically center text
-    .text((d: any) => d.split(' ').slice(0, 1))
-    .attr('font-size', '35px')
-    .append('tspan')
-    .attr('class', 'button-text-second-row')
-    .attr('fill', (d: any, i: any) => i === 0 ? '#6350f1' : '#aba1f6')
-    .attr('x', 7) // Adjust x position to center text
-    .attr('y', 70) // Adjust y position to vertically center text
-    .text((d: any) => d.split(' ').slice(1).join(' '))
-    .attr('font-size', '35px')
+    buttons
+      .append('text')
+      .attr('pointer-events', 'none')
+      .attr('class', 'button-text')
+      .append('tspan')
+      .attr('class', 'button-text-first-row')
+      .attr('fill', (d: any, i: any) => (i === 0 ? '#6350f1' : '#aba1f6'))
+      .attr('x', 30) // Adjust x position to center text
+      .attr('y', 37) // Adjust y position to vertically center text
+      .text((d: any) => d.split(' ').slice(0, 1))
+      .attr('font-size', '35px')
+      .append('tspan')
+      .attr('class', 'button-text-second-row')
+      .attr('fill', (d: any, i: any) => (i === 0 ? '#6350f1' : '#aba1f6'))
+      .attr('x', 7) // Adjust x position to center text
+      .attr('y', 70) // Adjust y position to vertically center text
+      .text((d: any) => d.split(' ').slice(1).join(' '))
+      .attr('font-size', '35px');
 
-    toggleButton.append('line')
-    .attr('class', 'separator-line')
-    .attr('x1', this.margin + 35)
-    .attr('x2', this.margin + 35)
-    .attr('y1', 0)
-    .attr('y2', 80)
-    .attr('stroke', '#d5d5d5')
-    .attr('stroke-width', 8);
+    toggleButton
+      .append('line')
+      .attr('class', 'separator-line')
+      .attr('x1', this.margin + 35)
+      .attr('x2', this.margin + 35)
+      .attr('y1', 0)
+      .attr('y2', 80)
+      .attr('stroke', '#d5d5d5')
+      .attr('stroke-width', 8);
 
     return toggleButton;
   }
 
   private toggleSelection = (event: any, d: any) => {
     if (
-      (d === 'Genres d\'accidents' && this.currentOptionIndex === 0) ||
+      (d === "Genres d'accidents" && this.currentOptionIndex === 0) ||
       (d === 'Natures de lésions' && this.currentOptionIndex === 1)
-    ) return;
+    )
+      return;
 
-    if (d === 'Genres d\'accidents') {
+    if (d === "Genres d'accidents") {
       this.currentOptionIndex = 0;
       this.currentForce = GENRE_Y_FORCE;
 
-      const genre_button = this.button.selectAll('.button').filter((d: any) => d === 'Genres d\'accidents');
+      const genre_button = this.button
+        .selectAll('.button')
+        .filter((d: any) => d === "Genres d'accidents");
       genre_button.select('rect').attr('fill', '#aba1f6');
       genre_button.selectAll('tspan').attr('fill', '#6350f1');
 
-      const nature_button = this.button.selectAll('.button').filter((d: any) => d === 'Natures de lésions');
+      const nature_button = this.button
+        .selectAll('.button')
+        .filter((d: any) => d === 'Natures de lésions');
       nature_button.select('rect').attr('fill', '#f4f3fd');
       nature_button.selectAll('tspan').attr('fill', '#aba1f6');
     } else {
       this.currentOptionIndex = 1;
       this.currentForce = NATURE_Y_FORCE;
 
-      const nature_button = this.button.selectAll('.button').filter((d: any) => d === 'Natures de lésions');
+      const nature_button = this.button
+        .selectAll('.button')
+        .filter((d: any) => d === 'Natures de lésions');
       nature_button.select('rect').attr('fill', '#aba1f6');
       nature_button.selectAll('tspan').attr('fill', '#6350f1');
 
-      const genre_button = this.button.selectAll('.button').filter((d: any) => d === 'Genres d\'accidents');
+      const genre_button = this.button
+        .selectAll('.button')
+        .filter((d: any) => d === "Genres d'accidents");
       genre_button.select('rect').attr('fill', '#f4f3fd');
       genre_button.selectAll('tspan').attr('fill', '#aba1f6');
     }
 
-    d3.selectAll("figure#bubble-bar-chart svg g :not(.toggle-button, .button, .button-text, .separator-line, .button-text-first-row, .button-text-second-row").remove();
+    d3.selectAll(
+      'figure#bubble-bar-chart svg g :not(.toggle-button, .button, .button-text, .separator-line, .button-text-first-row, .button-text-second-row'
+    ).remove();
     d3.text(this.dataPaths[this.currentOptionIndex]).then((data) => {
       this.data = [];
       let rowIndex = 0;
@@ -299,24 +326,12 @@ export class BubbleBarChartComponent implements OnInit {
 
       this.drawBubble();
       this.drawXAxis();
-      this.drawTitle();
       this.drawLegend();
-      
-      const simulation = this.getSimulation()
-      this.simulate(simulation)
-    });
-  }
 
-  private drawTitle(): void {
-    this.svg.append('text')
-    .style("pointer-events", "none")
-    .attr('x', this.width / 2)
-    .attr('y', 0)
-    .attr('text-anchor', 'middle')
-    .style('font-size', '3em')
-    .style('font-family', 'sans-serif')
-    .text(this.options[this.currentOptionIndex]);
-  }
+      const simulation = this.getSimulation();
+      this.simulate(simulation);
+    });
+  };
 
   // Simulation
 
@@ -416,10 +431,7 @@ export class BubbleBarChartComponent implements OnInit {
     const legend = this.svg
       .append('g')
       .attr('class', 'legend')
-      .attr(
-        'transform',
-        'translate(' + (this.width + 50) + ',' + 300 + ')'
-      );
+      .attr('transform', 'translate(' + (this.width + 50) + ',' + 300 + ')');
 
     legend
       .selectAll('.bubble-legend')
@@ -438,8 +450,8 @@ export class BubbleBarChartComponent implements OnInit {
           (this.radiusScale as d3.ScaleLinear<number, number>)(d)
       )
       .style('fill', 'none') // Transparent fill
-      .style('stroke', 'black') // Border color
-      .style('stroke-width', 1)
+      .style('stroke', '#070032') // Border color
+      .style('stroke-width', 1);
 
     legend
       .selectAll('.size')
@@ -458,6 +470,6 @@ export class BubbleBarChartComponent implements OnInit {
       .text((d: any) => (d === 500 ? '<' + d : d))
       .style('font-family', 'sans-serif')
       .style('font-size', '1.5rem')
-      .style('fill', 'black');
+      .style('fill', '#070032');
   }
 }

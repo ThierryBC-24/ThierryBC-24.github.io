@@ -29,8 +29,8 @@ export class Viz2Component implements OnInit {
       .append('svg')
       .attr('width', this.width + this.margin * 2)
       .attr('height', this.height + this.margin * 2)
-      .append('g')
-      .attr('transform', 'translate(' + this.margin + ',' + this.margin + ')');
+      .append('g');
+    // .attr('transform', 'translate(' + this.margin + ',' + this.margin + ')');
   }
 
   private formatData(data: any[]): any {
@@ -361,7 +361,7 @@ export class Viz2Component implements OnInit {
 
     this.svg
       .append('line')
-      .style('stroke', 'black')
+      .style('stroke', '#070032')
       .style('stroke-width', 1)
       .attr('x1', this.marginLeft)
       .attr('y1', this.margin)
@@ -371,21 +371,13 @@ export class Viz2Component implements OnInit {
     // Première option
     this.svg
       .append('line')
-      .style('stroke', 'black')
+      .style('stroke', '#070032')
       .style('stroke-width', 2)
       .attr('stroke-dasharray', '3,3')
       .attr('x1', x(scaleBreak) + this.marginLeft)
       .attr('y1', this.margin)
       .attr('x2', x(scaleBreak) + this.marginLeft)
       .attr('y2', this.height);
-
-    // Deuxième option
-    //   this.svg.append("rect")
-    //     .style('opacity', 0.5)
-    //     .attr("x", x(scaleBreak) + this.marginLeft)
-    //     .attr("y", this.margin)
-    //     .attr("height", this.height - this.margin)
-    //     .attr("width", x(scaleBreak + 0.1) - x(scaleBreak));
 
     // Legend
     this.drawLegend(bodyParts, color);
@@ -422,7 +414,7 @@ export class Viz2Component implements OnInit {
       .attr(
         'y',
         (d: any, i: number) =>
-        this.height - 300 + i * (size + spacingLegend) + size / 1.5
+          this.height - 300 + i * (size + spacingLegend) + size / 1.5
       )
       .text((d: any) => d)
       .attr('text-anchor', 'left')

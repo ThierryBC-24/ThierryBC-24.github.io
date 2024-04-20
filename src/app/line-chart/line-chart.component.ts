@@ -8,7 +8,7 @@ interface RisksData {
   'EXPOSITION AU BRUIT': number;
   'CHUTES DE MEME NIVEAU': number;
   'FRAPPE, COINCE OU ECRASE PAR UN OBJET': number;
-  'TOTAL': number;
+  TOTAL: number;
 }
 
 const RISK_NAMES: (keyof RisksData)[] = [
@@ -98,7 +98,7 @@ export class LineChartComponent implements OnInit {
           'EXPOSITION AU BRUIT': +columns[3],
           'CHUTES DE MEME NIVEAU': +columns[4],
           'FRAPPE, COINCE OU ECRASE PAR UN OBJET': +columns[5],
-          'TOTAL': +columns[6],
+          TOTAL: +columns[6],
         };
       })
       .filter((d) => d !== null) as RisksData[];
@@ -106,7 +106,7 @@ export class LineChartComponent implements OnInit {
 
   private prepareData(parsedData: RisksData[]): void {
     parsedData.forEach((d) => {
-      const totalRisks = d['TOTAL']
+      const totalRisks = d['TOTAL'];
 
       Object.keys(d).forEach((key) => {
         if (key !== 'ANNEE' && key !== 'TOTAL') {
@@ -134,11 +134,11 @@ export class LineChartComponent implements OnInit {
 
   private createYScale(parsedData: RisksData[]): any {
     const scaledValues: number[] = parsedData.flatMap((d) =>
-        Object.entries(d)
-      // Filter out the pairs where the key is either 'ANNEE' or 'TOTAL'
-      .filter(([key, value]) => key !== 'ANNEE' && key !== 'TOTAL')
-      // Map to get only the values
-      .map(([key, value]) => value)
+      Object.entries(d)
+        // Filter out the pairs where the key is either 'ANNEE' or 'TOTAL'
+        .filter(([key, value]) => key !== 'ANNEE' && key !== 'TOTAL')
+        // Map to get only the values
+        .map(([key, value]) => value)
     );
 
     const minYValue = d3.min(scaledValues) || 0;
@@ -278,7 +278,7 @@ export class LineChartComponent implements OnInit {
       )
       .attr('height', this.height - this.margin.top - this.margin.bottom)
       .attr('y', this.margin.top)
-      .attr('fill', '#E9E6FE')
+      .attr('fill', '#BBC8DE')
       .style('opacity', 0.5);
   }
 

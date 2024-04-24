@@ -6,6 +6,9 @@ type AgeData = {
   NB_LESION: number;
 };
 
+/**
+ * Represents the component for the waffle chart container.
+ */
 @Component({
   selector: 'app-waffle-chart-container',
   templateUrl: './waffle-chart-container.component.html',
@@ -14,12 +17,34 @@ type AgeData = {
 export class WaffleChartContainerComponent implements OnInit {
   constructor() {}
 
+  /**
+   * The width of the chart.
+   */
   public width = 0;
+
+  /**
+   * The height of the chart.
+   */
   private height = 0;
+
+  /**
+   * The data for the chart.
+   */
   public data: AgeData[] = [];
+
+  /**
+   * The total value of the chart.
+   */
   public totalValue = 0;
+
+  /**
+   * The legend for the chart.
+   */
   public legend: string = '';
 
+  /**
+   * Initializes the component.
+   */
   ngOnInit(): void {
     d3.text('/assets/data/Viz 3/groupe_age_lesion.csv').then((data) => {
       let rowIndex = 0;

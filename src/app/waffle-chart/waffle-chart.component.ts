@@ -11,6 +11,9 @@ type AgeData = {
   NB_LESION: number;
 };
 
+/**
+ * Represents the WaffleChartComponent.
+ */
 @Component({
   selector: 'app-waffle-chart',
   templateUrl: './waffle-chart.component.html',
@@ -24,11 +27,20 @@ export class WaffleChartComponent implements AfterViewInit {
   @Input() totalValue!: number;
   private marginTop = 25;
   public groupAgeId: string = '';
+
   constructor(private cdr: ChangeDetectorRef) {}
 
+  /**
+   * Lifecycle hook that is called after a component's view has been fully initialized.
+   */
   ngAfterViewInit(): void {
+    // Replace all spaces in the group age name with hyphens and prepend 'figure-' to form the group age ID
     this.groupAgeId = 'figure-' + this.data.GROUPE_AGE.replace(/ /g, '-');
+
+    // Detect changes in the component and update the view
     this.cdr.detectChanges();
+
+    // Get the HTML element with the ID equal to the group age name
     const container = document.getElementById(
       this.data.GROUPE_AGE
     ) as HTMLElement;
@@ -40,6 +52,9 @@ export class WaffleChartComponent implements AfterViewInit {
     this.drawWaffle(this.data);
   }
 
+  /**
+   * Creates the SVG element for the chart.
+   */
   private createSvg(): void {
     this.svg = d3
       .select('#' + this.groupAgeId)
@@ -51,6 +66,11 @@ export class WaffleChartComponent implements AfterViewInit {
     this.addAgeText(this.svg, this.data);
   }
 
+  /**
+   * Adds the age text to the chart.
+   * @param chart - The chart SVG element.
+   * @param data - The age data.
+   */
   private addAgeText(chart: any, data: AgeData): void {
     const ageText = data.GROUPE_AGE.replace(/(\d+)/g, '$1 ANS');
     chart
@@ -65,6 +85,11 @@ export class WaffleChartComponent implements AfterViewInit {
       .text(ageText);
   }
 
+  /**
+   * Adds the value text to the chart.
+   * @param chart - The chart SVG element.
+   * @param data - The age data.
+   */
   private addValueText(chart: any, data: AgeData): void {
     chart
       .append('text')
@@ -78,6 +103,10 @@ export class WaffleChartComponent implements AfterViewInit {
       .text(`${Math.round((100 * data.NB_LESION) / this.totalValue)}%`);
   }
 
+  /**
+   * Draws the waffle chart.
+   * @param data - The age data.
+   */
   private drawWaffle(data: AgeData): void {
     const rows = 10;
     const cols = 10;

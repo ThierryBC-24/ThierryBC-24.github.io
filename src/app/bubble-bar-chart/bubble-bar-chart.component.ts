@@ -6,6 +6,9 @@ const NATURE_Y_FORCE = 140000;
 const GENRE_Y_FORCE = 60000;
 const LABEL_CUTOFF = 200;
 
+/**
+ * Component for displaying a bubble bar chart.
+ */
 @Component({
   selector: 'app-bubble-bar-chart',
   templateUrl: './bubble-bar-chart.component.html',
@@ -34,6 +37,9 @@ export class BubbleBarChartComponent implements OnInit {
 
   constructor() {}
 
+  /**
+   * Lifecycle hook that is called after data-bound properties of a directive are initialized.
+   */
   ngOnInit(): void {
     d3.text(this.dataPaths[this.currentOptionIndex]).then((data) => {
       let rowIndex = 0;
@@ -68,6 +74,9 @@ export class BubbleBarChartComponent implements OnInit {
     });
   }
 
+  /**
+   * Creates the SVG element for the chart.
+   */
   private createSvg(): void {
     this.svg = d3
       .select('figure#bubble-bar-chart')
@@ -83,6 +92,10 @@ export class BubbleBarChartComponent implements OnInit {
 
   // Scales
 
+  /**
+   * Sets the X scale for the chart.
+   * @returns The X scale.
+   */
   private setXScale(): d3.ScaleBand<string> {
     return d3
       .scaleBand()
@@ -91,6 +104,10 @@ export class BubbleBarChartComponent implements OnInit {
       .padding(0.5);
   }
 
+  /**
+   * Sets the Y scale for the chart.
+   * @returns The Y scale.
+   */
   private setYScale(): d3.ScaleLinear<number, number> {
     return d3
       .scaleLinear()
@@ -98,6 +115,10 @@ export class BubbleBarChartComponent implements OnInit {
       .range([this.height, 0]);
   }
 
+  /**
+   * Sets the radius scale for the chart.
+   * @returns The radius scale.
+   */
   private setLinearRadiusScale(): d3.ScaleLinear<number, number> {
     return d3
       .scaleLinear()
@@ -107,6 +128,9 @@ export class BubbleBarChartComponent implements OnInit {
 
   // Drawings
 
+  /**
+   * Draws the bubbles on the chart.
+   */
   private drawBubble(): void {
     this.svg
       .selectAll('.bubble')
@@ -139,8 +163,10 @@ export class BubbleBarChartComponent implements OnInit {
       .on('mouseleave', (event: any) => this.hideTooltip(event));
   }
 
+  /**
+   * Draws the X axis on the chart.
+   */
   private drawXAxis(): void {
-    // Draw the X-axis on the DOM
     this.svg
       .append('g')
       .attr('class', 'x axis')
@@ -200,11 +226,15 @@ export class BubbleBarChartComponent implements OnInit {
     this.svg.selectAll('.x.axis .domain').remove();
   }
 
+  /**
+   * Draws the toggle button on the chart.
+   * @returns The toggle button element.
+   */
   private drawButton(): any {
     const toggleButton = this.svg
       .append('g')
       .attr('class', 'toggle-button')
-      .attr('transform', 'translate(' + (this.width - 100) + ',' + 100 + ')')
+      .attr('transform', 'translate(' + (this.width - 100) + ',' + 100 + ')') // Adjust x position to center button
       .style('cursor', 'pointer');
 
     const buttons = toggleButton
@@ -215,16 +245,16 @@ export class BubbleBarChartComponent implements OnInit {
       .attr('class', 'button')
       .attr(
         'transform',
-        (d: any, i: any) => `translate(${i * (this.margin + 40)}, 0)`
+        (d: any, i: any) => `translate(${i * (this.margin + 40)}, 0)` // Adjust x position to center button
       );
 
     buttons
       .append('rect')
       .attr('class', 'button')
-      .attr('width', this.margin + 30)
-      .attr('height', 80)
+      .attr('width', this.margin + 30) // Adjust width to center text
+      .attr('height', 80) // Adjust height to center text
       .attr('fill', (d: any, i: any) => (i === 0 ? '#aba1f6' : '#f4f3fd'))
-      .attr('x', (d: any, i: any) => (i === 0 ? 2 : -2))
+      .attr('x', (d: any, i: any) => (i === 0 ? 2 : -2)) // Adjust x position to center text
       .attr('rx', 0)
       .on('click', this.toggleSelection);
 
@@ -260,6 +290,11 @@ export class BubbleBarChartComponent implements OnInit {
     return toggleButton;
   }
 
+  /**
+   * Toggles the selection between "Genres d'accidents" and "Natures de lésions".
+   * @param event - The click event.
+   * @param d - The data associated with the clicked button.
+   */
   private toggleSelection = (event: any, d: any) => {
     if (
       (d === "Genres d'accidents" && this.currentOptionIndex === 0) ||
@@ -335,6 +370,10 @@ export class BubbleBarChartComponent implements OnInit {
 
   // Simulation
 
+  /**
+   * Generates the simulation used to center data to corresponding category.
+   * @returns The simulation.
+   */
   private getSimulation() {
     return d3
       .forceSimulation(this.data as d3.SimulationNodeDatum[])
@@ -372,7 +411,11 @@ export class BubbleBarChartComponent implements OnInit {
           .iterations(10)
       );
   }
-
+  
+  /**
+   * Simulates the movement of the bubbles on the chart.
+   * @param simulation - The simulation to be used.
+   */
   private simulate(simulation: any) {
     simulation.on('tick', () => {
       this.svg
@@ -384,6 +427,10 @@ export class BubbleBarChartComponent implements OnInit {
 
   // Tooltip
 
+  /**
+   * Creates the tooltip element.
+   * @returns The tooltip element.
+  */
   private createTooltip() {
     return d3
       .select('figure#bubble-bar-chart')
@@ -392,6 +439,11 @@ export class BubbleBarChartComponent implements OnInit {
       .style('background-color', 'white');
   }
 
+  /**
+   * Shows the tooltip on the chart.
+   * @param event - The mouseenter event.
+   * @param d - The data associated with the bubble.
+   */
   private showTooltip(event: any, d: any) {
     d3.select(event.target).attr('opacity', 1);
     this.tooltip.transition().duration(200).style('opacity', 1);
@@ -420,6 +472,10 @@ export class BubbleBarChartComponent implements OnInit {
       );
   }
 
+  /**
+   * Hides the tooltip on the chart.
+   * @param event - The mouseleave event.
+   */
   private hideTooltip(event: any) {
     d3.select(event.target).attr('opacity', 0.7);
     this.tooltip.transition().duration(200).style('opacity', 0);
@@ -427,6 +483,9 @@ export class BubbleBarChartComponent implements OnInit {
 
   // Legend
 
+  /**
+   * Draws the legend on the chart.
+   */
   private drawLegend() {
     const legend = this.svg
       .append('g')

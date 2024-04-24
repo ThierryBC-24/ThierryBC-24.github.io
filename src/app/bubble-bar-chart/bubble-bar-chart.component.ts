@@ -184,7 +184,7 @@ export class BubbleBarChartComponent implements OnInit {
           line = [word];
           tspan = text2
             .append('tspan')
-            .attr('font-size', 1.3 + 'em')
+            .attr('font-size', 1.1 + 'em')
             .attr('x', 0)
             .attr('y', 3)
             .attr('dy', lineHeight + 'em')

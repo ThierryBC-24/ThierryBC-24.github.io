@@ -23,6 +23,7 @@ export class Viz2Component implements OnInit {
     this.drawGroupedBars(data.bodySeats, data.bodyParts);
   }
 
+  // Create svg that contains the graph
   private createSvg(): void {
     this.svg = d3
       .select('figure#bar')
@@ -30,25 +31,23 @@ export class Viz2Component implements OnInit {
       .attr('width', this.width + this.margin * 2)
       .attr('height', this.height + this.margin * 2)
       .append('g');
-    // .attr('transform', 'translate(' + this.margin + ',' + this.margin + ')');
   }
 
   private formatData(data: any[]): any {
+    // Transform data to include percentages
     const lesions = data.map((item) => item.NLesions);
     const sum = lesions.reduce((acc, curr) => acc + curr, 0);
     data.forEach((item) => (item.percent = item.NLesions / sum));
 
+    // Create data with only bodyParts
+    const bodyParts: any[] = [];
     const grouped = data.reduce((groups, item) => {
       (groups[item.BodyPart] ||= []).push(item);
       return groups;
     }, {});
-    const bodyParts: any[] = [];
     for (const g in grouped) {
       const lesionsSeat = grouped[g].map((item: any) => item.NLesions);
-      const sumSeat = lesionsSeat.reduce(
-        (acc: any, curr: any) => acc + curr,
-        0
-      );
+      const sumSeat = lesionsSeat.reduce((acc: any, curr: any) => acc + curr, 0);
       bodyParts.push({
         BodyPart: g,
         percent: sumSeat / sum,
@@ -56,7 +55,10 @@ export class Viz2Component implements OnInit {
       });
     }
 
+    // Order bodyParts from biggest percentages to smallest
     bodyParts.sort((a: any, b: any) => b.percent - a.percent);
+
+    // Order bodySeats from biggest percentages to smallest
     const orderedData = bodyParts.map((b: any) =>
       data
         .filter((d: any) => d.BodyPart === b.BodyPart)
@@ -67,15 +69,18 @@ export class Viz2Component implements OnInit {
   }
 
   private drawGroupedBars(data: any[], bodyPartsData: any): void {
+    // Arrays that contain bodyParts and bodySeats names in order of appearance
     const bodyParts = Array.from(new Set(data.map((d) => d.BodyPart)));
     const bodySeats = Array.from(data.map((d) => d.BodySeat));
 
+    // Constants
     const scaleBreak = 0.15;
     const paddingBars = 0.3;
     const paddingBodyParts = 20;
     const opacityBigBars = 0.3;
     const percentFormat = d3.format('.0%');
 
+    // x scale
     const x = d3
       .scaleLinear()
       .domain([0, scaleBreak, scaleBreak, 0.5])
@@ -86,6 +91,7 @@ export class Viz2Component implements OnInit {
         this.width - this.margin * 3,
       ]);
 
+    // y scale
     const y = d3
       .scaleBand()
       .domain(data.map((d) => d.BodySeat))
@@ -95,19 +101,21 @@ export class Viz2Component implements OnInit {
       ])
       .padding(paddingBars);
 
+    // Helpers to position bars on the graph
     const paddingBarsLength =
       ((y.range()[1] - y.range()[0]) * paddingBars) /
       data.map((d) => d.BodySeat).length;
     const percentFontSize =
       String(y.bandwidth() * 1.5 + paddingBarsLength) + 'px';
 
+    // color scale
     const color = d3
       .scaleOrdinal()
       .domain(bodyParts)
       .range(d3.schemeSet2)
       .unknown('#ccc');
 
-    // Big bars
+    // bodyParts bars
     let totalHeights = 0;
     this.svg
       .append('g')
@@ -153,7 +161,6 @@ export class Viz2Component implements OnInit {
           .transition()
           .duration(200)
           .style('opacity', 0.4);
-
         d3.selectAll('.legend-element.' + d.BodyPart.replace(' ', '.'))
           .transition()
           .duration(200)
@@ -190,7 +197,7 @@ export class Viz2Component implements OnInit {
           .style('opacity', 0);
       });
 
-    // Big percentages
+    // bodyParts percentages
     totalHeights = 0;
     this.svg
       .selectAll()
@@ -221,7 +228,7 @@ export class Viz2Component implements OnInit {
         return percentFormat(d.percent);
       });
 
-    // Small percentages
+    // bodySeats percentages
     this.svg
       .selectAll()
       .data(data)
@@ -250,7 +257,7 @@ export class Viz2Component implements OnInit {
         return percentFormat(d.percent);
       });
 
-    // Small bars
+    // bodySeats bars
     this.svg
       .append('g')
       .selectAll()
@@ -368,7 +375,7 @@ export class Viz2Component implements OnInit {
       .attr('x2', this.marginLeft)
       .attr('y2', this.height);
 
-    // Première option
+    // Scale break
     this.svg
       .append('line')
       .style('stroke', '#070032')
@@ -389,6 +396,8 @@ export class Viz2Component implements OnInit {
   ) {
     const size = 15;
     const spacingLegend = 15;
+    
+    // Legend rectangles
     this.svg
       .selectAll()
       .data(bodyParts)
@@ -404,6 +413,7 @@ export class Viz2Component implements OnInit {
       .attr('height', size)
       .style('fill', (d: any) => color(d));
 
+    // Legend labels
     this.svg
       .selectAll()
       .data(bodyParts)

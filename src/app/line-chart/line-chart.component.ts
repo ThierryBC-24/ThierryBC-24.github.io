@@ -19,6 +19,10 @@ const RISK_NAMES: (keyof RisksData)[] = [
   'FRAPPE, COINCE OU ECRASE PAR UN OBJET',
 ];
 
+/**
+ * Represents the LineChartComponent class.
+ * This component displays a line chart with data from a CSV file.
+ */
 @Component({
   selector: 'app-line-chart',
   templateUrl: './line-chart.component.html',
@@ -40,12 +44,18 @@ export class LineChartComponent implements OnInit {
 
   constructor() {}
 
+  /**
+   * Initializes the SVG container for the line chart.
+   */
   ngOnInit(): void {
     this.initializeSvg();
     this.drawBackground();
     this.drawChart();
   }
 
+  /**
+   * Initializes the SVG container for the line chart.
+   */
   private initializeSvg(): void {
     const container = document.getElementById('line-chart') as HTMLElement;
 
@@ -61,6 +71,9 @@ export class LineChartComponent implements OnInit {
       .attr('transform', `translate(0, 0)`);
   }
 
+  /**
+   * Draws the line chart.
+   */
   private drawChart(): void {
     d3.text('/assets/data/Viz 7/annee_risques.csv')
       .then((data) => {
@@ -82,6 +95,9 @@ export class LineChartComponent implements OnInit {
       });
   }
 
+  /**
+   * Parses the CSV data.
+   */
   private parseCsvData(data: string): RisksData[] {
     let rowIndex = 0;
     return d3
@@ -104,6 +120,9 @@ export class LineChartComponent implements OnInit {
       .filter((d) => d !== null) as RisksData[];
   }
 
+  /**
+   * Modifies the data parsed from the csv to be useable for the line chart.
+   */
   private prepareData(parsedData: RisksData[]): void {
     parsedData.forEach((d) => {
       const totalRisks = d['TOTAL'];
@@ -117,6 +136,9 @@ export class LineChartComponent implements OnInit {
     });
   }
 
+  /**
+   * Creates the X scale for the line chart.
+   */
   private createXScale(parsedData: RisksData[]): any {
     const yearExtent = d3.extent(parsedData, (d) => d.ANNEE) as [
       number,
@@ -132,6 +154,9 @@ export class LineChartComponent implements OnInit {
     return this.xScale;
   }
 
+  /**
+   * Creates the Y scale for the line chart.
+   */
   private createYScale(parsedData: RisksData[]): any {
     const scaledValues: number[] = parsedData.flatMap((d) =>
       Object.entries(d)
@@ -152,6 +177,9 @@ export class LineChartComponent implements OnInit {
     return this.yScale;
   }
 
+  /**
+   * Draws the lines for the line chart.
+   */
   private drawLines(parsedData: RisksData[], xScale: any, yScale: any): void {
     RISK_NAMES.forEach((risk: keyof RisksData) => {
       const line = d3
@@ -194,6 +222,9 @@ export class LineChartComponent implements OnInit {
     });
   }
 
+  /**
+   * Draws the axes for the line chart.
+   */
   private drawAxes(xScale: any, yScale: any): void {
     this.svg
       .append('g')
@@ -219,6 +250,9 @@ export class LineChartComponent implements OnInit {
       .attr('stroke-opacity', 0.2);
   }
 
+  /**
+   * Draws the legend for the line chart.
+   */
   private drawLegend(risks: (keyof RisksData)[]): void {
     const legend = d3
       .select('figure#legend-line-chart')
@@ -268,6 +302,9 @@ export class LineChartComponent implements OnInit {
       );
   }
 
+  /**
+   * Draws the background of the line chart representing before and after the changes made by the CNESST.
+   */
   private drawBackground(): void {
     this.svg
       .append('rect')
@@ -282,10 +319,13 @@ export class LineChartComponent implements OnInit {
       .style('opacity', 0.5);
   }
 
-  private handleHover(risk: keyof RisksData, circle?: SVGCircleElement): void {
-    d3.selectAll("circle[class*='dot']").style('opacity', 0.3);
-    d3.selectAll("path[class*='line']").style('opacity', 0.3);
-    d3.selectAll(`g[class^='legend-item']`).style('opacity', 0.3);
+  /**
+   * Changes the opacity of the lines and circles in the line chart.
+   */
+  private changeOpacity(risk: keyof RisksData, opacity: number): void {
+    d3.selectAll("circle[class*='dot']").style('opacity', opacity);
+    d3.selectAll("path[class*='line']").style('opacity', opacity);
+    d3.selectAll(`g[class^='legend-item']`).style('opacity', opacity);
     d3.selectAll(`circle[class*='dot-${risk.replace(/ /g, '-')}']`).style(
       'opacity',
       1
@@ -295,31 +335,19 @@ export class LineChartComponent implements OnInit {
       1
     );
     d3.selectAll(`g[class='legend-item ${risk}']`).style('opacity', 1);
+  }
+
+  /**
+   * Handles the hover event on the line chart.
+   */
+  private handleHover(risk: keyof RisksData, circle?: SVGCircleElement): void {
+    this.changeOpacity(risk, 0.3);
 
     if (circle) {
       const data: RisksData = d3.select(circle).datum() as RisksData;
       let g = d3.select(circle.parentNode as SVGGElement);
 
-      const defs = this.svg.append('defs');
-      const filter = defs.append('filter').attr('id', 'dropshadow');
-
-      filter
-        .append('feGaussianBlur')
-        .attr('in', 'SourceAlpha')
-        .attr('stdDeviation', 0.5)
-        .attr('result', 'blur');
-
-      filter
-        .append('feOffset')
-        .attr('in', 'blur')
-        .attr('dx', 0)
-        .attr('dy', 0)
-        .attr('result', 'offsetBlur');
-
-      var feMerge = filter.append('feMerge');
-
-      feMerge.append('feMergeNode').attr('in', 'offsetBlur');
-      feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+      this.addShadow();
 
       let group = g.append('g').attr('class', 'tooltip');
       let colorRect = group
@@ -369,6 +397,35 @@ export class LineChartComponent implements OnInit {
     }
   }
 
+  /**
+   * Adds a shadow to the tooltip.
+   */
+  private addShadow(): void {
+    const defs = this.svg.append('defs');
+    const filter = defs.append('filter').attr('id', 'dropshadow');
+
+    filter
+      .append('feGaussianBlur')
+      .attr('in', 'SourceAlpha')
+      .attr('stdDeviation', 0.5)
+      .attr('result', 'blur');
+
+    filter
+      .append('feOffset')
+      .attr('in', 'blur')
+      .attr('dx', 0)
+      .attr('dy', 0)
+      .attr('result', 'offsetBlur');
+
+    var feMerge = filter.append('feMerge');
+
+    feMerge.append('feMergeNode').attr('in', 'offsetBlur');
+    feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+  }
+
+  /**
+   * Handles the mouseout event on the line chart.
+   */
   private handleOut(): void {
     d3.selectAll("circle[class*='dot']").style('opacity', 1);
     d3.selectAll("path[class*='line']").style('opacity', 1);

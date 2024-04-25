@@ -10,7 +10,7 @@ import { data_viz2 } from 'data/Viz 2/data_complete';
 export class Viz2Component implements OnInit {
   private svg: any;
   private margin = 50;
-  private marginLeft = 200;
+  private marginLeft = 320;
   private width = 1200 - this.margin * 2;
   private height = 700 - this.margin * 2;
   private data = data_viz2;
@@ -396,7 +396,7 @@ export class Viz2Component implements OnInit {
   ) {
     const size = 15;
     const spacingLegend = 15;
-    
+
     // Legend rectangles
     this.svg
       .selectAll()

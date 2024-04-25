@@ -3,11 +3,11 @@ import * as d3 from 'd3';
 import { data_viz2 } from 'data/Viz 2/data_complete';
 
 @Component({
-  selector: 'app-viz2',
-  templateUrl: './viz2.component.html',
-  styleUrls: ['./viz2.component.scss'],
+  selector: 'app-bar-chart',
+  templateUrl: './bar-chart.component.html',
+  styleUrls: ['./bar-chart.component.scss'],
 })
-export class Viz2Component implements OnInit {
+export class BarChartComponent implements OnInit {
   private svg: any;
   private margin = 50;
   private marginLeft = 320;
